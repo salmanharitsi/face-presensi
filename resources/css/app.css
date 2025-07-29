@@ -1,11 +1,477 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+* {
+    font-family: 'Poppins', sans-serif;
+    scroll-behavior: smooth;
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    33% {
+        transform: translateY(-20px) rotate(120deg);
+    }
+
+    66% {
+        transform: translateY(-10px) rotate(240deg);
+    }
+}
+
+@keyframes pulse-slow {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-slide-up {
+    animation: slideInUp 0.8s ease-out;
+}
+
+.glassmorphic {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* css memberikan animasi garis di navbar home page*/
+.nav-link {
+    position: relative;
+    text-decoration: none;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s ease-in-out;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* css untuk animasi responsif navbar di home page */
+.slide-down-enter {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+.slide-down-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: transform 0.5s;
+}
+.slide-down-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+.slide-down-exit-active {
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: opacity 0.5s, transform 0.5s;
+}
+
+/* css untuk gradient img */
+.gradient-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 90%;
+    background: linear-gradient(to top, black, transparent);
+    z-index: 1;
+}
+
+.gradient-overlay-about::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 90%;
+    background: linear-gradient(to right, black, transparent);
+    z-index: 1;
+}
+
+.gradient-overlay-login::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40%;
+    height: 100%;
+    opacity: 100%;
+    background: linear-gradient(to left, rgb(255, 255, 255), transparent);
+    z-index: 1;
+}
+
+@media screen and (max-width: 1024px) {
+    .gradient-overlay-login::after {
+        background: transparent;
+    }
+}
+
+.gradient-overlay-registrasi::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    opacity: 100%;
+    background: linear-gradient(to top, rgb(243 244 246), transparent);
+    z-index: 1;
+}
+
+/* css untuk parallax img beranda dan about */
+.parallax-beranda {
+    background-image: url("../../public/assets/home/beranda/BPS.jpg");
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.parallax-about {
+    background-image: url("../../public/assets/home/about/about.JPEG");
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.parallax-about::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(
+        0,
+        0,
+        0,
+        0.4
+    ); /* Adjust the opacity to make it darker or lighter */
+    z-index: 1;
+}
+
+/* css hover card informasi fungsi bagian */
+li .fungsi-card-parent {
+    position: relative;
+    overflow: hidden;
+}
+
+.icon-container {
+    position: relative;
+}
+
+.icon-info {
+    position: relative;
+    display: inline-block;
+    z-index: 2;
+}
+
+li .fungsi-card-parent .overlay {
+    /* background: linear-gradient(to left, #2162cc, #1845da); */
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1;
+    border-radius: 8px;
+}
+
+@media screen and (min-width: 1190px) and (max-width: 1800px) {
+    .registrasi {
+        height: 125vh !important;
+    }
+}
+
+/* Tambahkan CSS ini untuk gaya sidebar yang mengecil */
+.aside-collapsed {
+    width: 80px; /* Ukuran sidebar saat mengecil */
+}
+
+.aside-collapsed .sidebar-nav ul li a span {
+    display: none; /* Sembunyikan teks menu saat sidebar mengecil */
+}
+
+.aside-collapsed .sidebar-nav ul li a i {
+    margin-right: 0; /* Atur margin icon */
+}
+
+.aside-collapsed #toggle-sidebar i {
+    transform: rotate(180deg); /* Putar ikon tombol saat sidebar mengecil */
+}
+
+/* untuk animasi show */
+.show-div {
+    display: block;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-in-div {
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.hover-gradient-purple {
+    border: none;
+    background-image: linear-gradient(to left, #4c00ce, #1c64f2);
+    position: relative;
+    z-index: 20; /* Memastikan teks tetap di atas */
+}
+
+.hover-gradient-purple::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to right, #9557ff, #1c64f2);
+    opacity: 0;
+    transition: opacity .7s;
+    z-index: -1; /* Menempatkan di belakang konten */
+    border-radius: inherit; /* Mewarisi border radius */
+}
+
+.hover-gradient-purple:hover::before {
+    opacity: 1;
+}
+
+/* ================================================ */
+/* LAYOUTS DASHBOARD */
+/* ================================================ */
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Sidebar Animations */
+.sidebar-expanded {
+    width: 280px;
+}
+
+.sidebar-collapsed {
+    width: 80px;
+}
+
+.sidebar-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Menu Item Animations */
+.menu-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.menu-item:hover::before {
+    left: 100%;
+}
+
+/* Mobile Sidebar Fixes */
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 50;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile-sidebar-open {
+    transform: translateX(0);
+}
+
+/* Prevent body scroll when mobile sidebar is open */
+.mobile-sidebar-active {
+    overflow: hidden;
+}
+
+/* Desktop Sidebar */
+.desktop-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.desktop-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Notification Badge */
+.notification-badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Hover Effects */
+.hover-lift {
+    transition: transform 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+/* Status Indicators */
+.status-online {
+    background: linear-gradient(45deg, #10b981, #34d399);
+}
+
+.status-away {
+    background: linear-gradient(45deg, #f59e0b, #fbbf24);
+}
+
+/* Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 600ms linear;
+    background-color: rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+button, .menu-item {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Mobile Safe Area */
+@supports (padding: max(0px)) {
+    .mobile-sidebar {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+    }
+}
+
+/* Expand button styling - DIPERBAIKI */
+.expand-btn-fixed {
+    position: fixed;
+    top: 42px;
+    left: 85px;
+    transform: translateY(-50%);
+    z-index: 35;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.expand-btn-fixed.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Perbaikan posisi icon saat collapsed - PENAMBAHAN */
+.desktop-sidebar.sidebar-collapsed .menu-item {
+    justify-content: center;
+}
+
+.desktop-sidebar.sidebar-collapsed .menu-item i {
+    margin: 0 !important;
+}
+
+/* Perbaikan header saat collapsed - PENAMBAHAN */
+.desktop-sidebar.sidebar-collapsed #logo-section {
+    justify-content: center;
+}
+
+.desktop-sidebar.sidebar-collapsed #collapse-btn {
+    display: none;
 }
