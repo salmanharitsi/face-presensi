@@ -29,17 +29,17 @@ class UserSeeder extends Seeder
                 'role' => 'guru',
             ],
             [
-                'name' => 'Salman Al Haritsi',
-                'nip' => '12345678934',
-                'email' => 'salmanalharitsi14@gmail.com',
-                'password' => 'salman123',
-                'role' => 'guru',
-            ],
-            [
                 'name' => 'Septania Daniati Panjaitan',
                 'nip' => '12345678935',
                 'email' => 'septania@gmail.com',
                 'password' => 'septa123',
+                'role' => 'guru',
+            ],
+            [
+                'name' => 'Karin Dwi Purnomo',
+                'nip' => '12345678938',
+                'email' => 'karin@gmail.com',
+                'password' => 'karin123',
                 'role' => 'guru',
             ],
         ];
