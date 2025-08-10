@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends($layout)
 
 @section('title', 'Guru Presensi')
 
@@ -15,6 +15,11 @@
                 $isAfterAttendanceTime = $currentTime > '07:15';
                 $isPulangTimeAvailable = $currentTime >= '13:00' && $currentTime <= '18:00';
 
+                $tidakHadir = auth()->user()->presensi()
+                    ->whereDate('created_at', \Carbon\Carbon::today())
+                    ->where('status', 'tidak-hadir')
+                    ->first();
+
                 $presensiHariIni = auth()->user()->presensi()
                     ->whereDate('created_at', \Carbon\Carbon::today())
                     ->whereNotNull('jam_masuk')
@@ -25,135 +30,750 @@
                     ->first()->status ?? 'menunggu';
             @endphp
 
-            @if($dinasLuarHariIni)
-                @if($dinasLuarStatus == 'menunggu')
-                    <!-- Card Menunggu Persetujuan Dinas Luar -->
-                    <div class="lg:col-span-2">
-                        <div class="group relative">
+            @if ($tidakHadir)
+                <!-- Card Tidak Hadir -->
+                <div class="lg:col-span-2">
+                    <div class="group relative">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-red-400 to-rose-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                        </div>
+
+                        <div class="relative">
                             <div
-                                class="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                            </div>
+                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-red-500 hover:bg-red-50">
 
-                            <div class="relative">
-                                <div
-                                    class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-amber-600 hover:bg-amber-50">
-
-                                    <!-- Card Header -->
-                                    <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
-                                        <div class="flex items-center space-x-4">
-                                            <div
-                                                class="w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                                                <i class="fas fa-clock text-white text-xl flex-shrink-0"></i>
-                                            </div>
-                                            <div>
-                                                <h3 class="text-2xl font-bold text-gray-800">Menunggu Persetujuan</h3>
-                                                <p class="text-amber-600 font-medium">Pengajuan Dinas Luar</p>
-                                            </div>
-                                        </div>
-                                        <div class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                            <i class="fas fa-hourglass-half mr-1"></i>
-                                            Pending
-                                        </div>
-                                    </div>
-
-                                    <!-- Illustration -->
-                                    <div class="mb-8 relative">
+                                <!-- Card Header -->
+                                <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                    <div class="flex items-center space-x-4">
                                         <div
-                                            class="w-full h-48 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                            <!-- Background Pattern -->
-                                            <div class="absolute inset-0 opacity-10">
-                                                <div class="absolute top-4 left-4 w-8 h-8 bg-amber-400 rounded-full animate-pulse">
-                                                </div>
-                                                <div
-                                                    class="absolute top-12 right-8 w-6 h-6 bg-orange-400 rounded-full animate-pulse delay-150">
-                                                </div>
-                                                <div
-                                                    class="absolute bottom-8 left-12 w-4 h-4 bg-amber-300 rounded-full animate-pulse delay-300">
-                                                </div>
-                                                <div
-                                                    class="absolute bottom-4 right-4 w-10 h-10 bg-orange-300 rounded-full animate-pulse delay-500">
-                                                </div>
-                                            </div>
-
-                                            <!-- Main Icon -->
-                                            <div class="relative z-10">
-                                                <svg class="w-24 h-24 text-amber-500 animate-spin-slow" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                </svg>
-                                            </div>
+                                            class="w-14 h-14 bg-gradient-to-r from-red-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-exclamation-triangle text-white text-xl flex-shrink-0"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-2xl font-bold text-gray-800">Tidak Hadir</h3>
+                                            <p class="text-red-600 font-medium">Absensi Terlewat</p>
                                         </div>
                                     </div>
+                                    <div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                        <i class="fas fa-times-circle mr-1"></i>
+                                        Absent
+                                    </div>
+                                </div>
 
-                                    <!-- Card Content -->
-                                    <div class="space-y-4">
-                                        <p class="text-gray-600 text-lg leading-relaxed text-center">
-                                            Pengajuan dinas luar Anda sedang menunggu persetujuan dari Kepala Sekolah.
-                                            Mohon tunggu notifikasi selanjutnya.
-                                        </p>
+                                <!-- Illustration -->
+                                <div class="mb-8 relative">
+                                    <div
+                                        class="w-full h-48 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                        <!-- Background Pattern -->
+                                        <div class="absolute inset-0 opacity-10">
+                                            <div class="absolute top-4 left-4 w-8 h-8 bg-red-400 rounded-full animate-pulse">
+                                            </div>
+                                            <div
+                                                class="absolute top-12 right-8 w-6 h-6 bg-rose-400 rounded-full animate-pulse delay-150">
+                                            </div>
+                                            <div
+                                                class="absolute bottom-8 left-12 w-4 h-4 bg-red-300 rounded-full animate-pulse delay-300">
+                                            </div>
+                                            <div
+                                                class="absolute bottom-4 right-4 w-10 h-10 bg-rose-300 rounded-full animate-pulse delay-500">
+                                            </div>
+                                        </div>
+
+                                        <!-- Main Icon -->
+                                        <div class="relative z-10">
+                                            <svg class="w-24 h-24 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Content -->
+                                <div class="space-y-6 text-center">
+                                    <h4 class="text-3xl font-bold text-gray-800">Anda tidak hadir hari ini</h4>
+                                    <p class="text-gray-600 text-lg leading-relaxed">
+                                        Absensi untuk hari ini belum dilakukan atau telah terlewat. Silakan hubungi atasan atau
+                                        HR untuk informasi lebih lanjut.
+                                    </p>
+
+                                    <!-- Status Badge -->
+                                    <div
+                                        class="inline-flex items-center bg-red-100 text-red-800 px-6 py-3 rounded-full text-lg font-semibold">
+                                        <i class="fas fa-calendar-times mr-2 text-red-500"></i>
+                                        Tidak Hadir Hari Ini
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @elseif(\Carbon\Carbon::now()->isSunday())
+                <!-- Card Hari Minggu -->
+                <div class="lg:col-span-2">
+                    <div class="group relative">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                        </div>
+
+                        <div class="relative">
+                            <div
+                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-blue-500 hover:bg-blue-50">
+
+                                <!-- Card Header -->
+                                <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                    <div class="flex items-center space-x-4">
+                                        <div
+                                            class="w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-bed text-white text-xl flex-shrink-0"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-2xl font-bold text-gray-800">Hari Libur</h3>
+                                            <p class="text-blue-600 font-medium">Minggu - Weekend</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                        <i class="fas fa-calendar mr-1"></i>
+                                        Weekend
+                                    </div>
+                                </div>
+
+                                <!-- Illustration -->
+                                <div class="mb-8 relative">
+                                    <div
+                                        class="w-full h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                        <!-- Background Pattern -->
+                                        <div class="absolute inset-0 opacity-10">
+                                            <div class="absolute top-4 left-4 w-8 h-8 bg-blue-400 rounded-full animate-bounce">
+                                            </div>
+                                            <div
+                                                class="absolute top-12 right-8 w-6 h-6 bg-indigo-400 rounded-full animate-bounce delay-150">
+                                            </div>
+                                            <div
+                                                class="absolute bottom-8 left-12 w-4 h-4 bg-blue-300 rounded-full animate-bounce delay-300">
+                                            </div>
+                                            <div
+                                                class="absolute bottom-4 right-4 w-10 h-10 bg-indigo-300 rounded-full animate-bounce delay-500">
+                                            </div>
+                                        </div>
+
+                                        <!-- Main Icon -->
+                                        <div class="relative z-10">
+                                            <svg class="w-24 h-24 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-4h2v2h-2zm0-8h2v6h-2z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Content -->
+                                <div class="space-y-6 text-center">
+                                    <h4 class="text-3xl font-bold text-gray-800">Selamat Hari Minggu! 🌞</h4>
+                                    <p class="text-gray-600 text-lg leading-relaxed">
+                                        Hari ini adalah hari libur (Minggu). Presensi tidak diperlukan pada hari ini. Selamat
+                                        beristirahat dan nikmati waktu libur Anda!
+                                    </p>
+
+                                    <!-- Status Badge -->
+                                    <div
+                                        class="inline-flex items-center bg-blue-100 text-blue-800 px-6 py-3 rounded-full text-lg font-semibold">
+                                        <i class="fas fa-calendar-check mr-2 text-blue-500"></i>
+                                        Hari Libur - Presensi Tidak Tersedia
                                     </div>
 
-                                    <!-- Status Info -->
-                                    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-4">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-info-circle text-amber-500 mr-3"></i>
-                                            <div>
-                                                <p class="text-amber-800 font-medium">Status: Menunggu Persetujuan</p>
-                                                <p class="text-amber-600 text-sm">Anda akan menerima notifikasi setelah pengajuan
-                                                    diproses</p>
-                                            </div>
+                                    <!-- Additional Info -->
+                                    <div class="bg-blue-50 rounded-lg p-4 mt-6">
+                                        <div class="flex items-center justify-center space-x-2 text-blue-700">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="text-sm font-medium">Presensi akan kembali tersedia pada hari
+                                                Senin</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                @elseif($dinasLuarStatus == 'disetujui' && $belumLaporKehadiran)
-                    <!-- Card Laporkan Kehadiran (Dinas Luar Disetujui) -->
+                </div>
+            @else
+                @if($dinasLuarHariIni)
+                    @if($dinasLuarStatus == 'menunggu')
+                        <!-- Card Menunggu Persetujuan Dinas Luar -->
+                        <div class="lg:col-span-2">
+                            <div class="group relative">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                                </div>
+
+                                <div class="relative">
+                                    <div
+                                        class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-amber-600 hover:bg-amber-50">
+
+                                        <!-- Card Header -->
+                                        <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                            <div class="flex items-center space-x-4">
+                                                <div
+                                                    class="w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                    <i class="fas fa-clock text-white text-xl flex-shrink-0"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-2xl font-bold text-gray-800">Menunggu Persetujuan</h3>
+                                                    <p class="text-amber-600 font-medium">Pengajuan Dinas Luar</p>
+                                                </div>
+                                            </div>
+                                            <div class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-hourglass-half mr-1"></i>
+                                                Pending
+                                            </div>
+                                        </div>
+
+                                        <!-- Illustration -->
+                                        <div class="mb-8 relative">
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                                <!-- Background Pattern -->
+                                                <div class="absolute inset-0 opacity-10">
+                                                    <div class="absolute top-4 left-4 w-8 h-8 bg-amber-400 rounded-full animate-pulse">
+                                                    </div>
+                                                    <div
+                                                        class="absolute top-12 right-8 w-6 h-6 bg-orange-400 rounded-full animate-pulse delay-150">
+                                                    </div>
+                                                    <div
+                                                        class="absolute bottom-8 left-12 w-4 h-4 bg-amber-300 rounded-full animate-pulse delay-300">
+                                                    </div>
+                                                    <div
+                                                        class="absolute bottom-4 right-4 w-10 h-10 bg-orange-300 rounded-full animate-pulse delay-500">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Main Icon -->
+                                                <div class="relative z-10">
+                                                    <svg class="w-24 h-24 text-amber-500 animate-spin-slow" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Content -->
+                                        <div class="space-y-4">
+                                            <p class="text-gray-600 text-lg leading-relaxed text-center">
+                                                Pengajuan dinas luar Anda sedang menunggu persetujuan dari Kepala Sekolah.
+                                                Mohon tunggu notifikasi selanjutnya.
+                                            </p>
+                                        </div>
+
+                                        <!-- Status Info -->
+                                        <div class="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-info-circle text-amber-500 mr-3"></i>
+                                                <div>
+                                                    <p class="text-amber-800 font-medium">Status: Menunggu Persetujuan</p>
+                                                    <p class="text-amber-600 text-sm">Anda akan menerima notifikasi setelah pengajuan
+                                                        diproses</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($dinasLuarStatus == 'ditolak')
+                        <!-- Card Dinas Luar Ditolak -->
+                        <div class="lg:col-span-2">
+                            <div class="group relative">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-red-400 to-rose-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                                </div>
+
+                                <div class="relative">
+                                    <div
+                                        class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-red-600 hover:bg-red-50">
+
+                                        <!-- Pesan Penolakan -->
+                                        <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
+                                                <div>
+                                                    <p class="text-red-800 font-bold text-lg">Dinas Luar Kamu sebelumnya ditolak</p>
+                                                    <p class="text-red-600 text-sm">Silakan lapor presensi seperti biasa atau ajukan
+                                                        dinas luar yang baru</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Header -->
+                                        <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                            <div class="flex items-center space-x-4">
+                                                <div
+                                                    class="w-14 h-14 bg-gradient-to-r from-red-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                    <i class="fas fa-times-circle text-white text-xl flex-shrink-0"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-2xl font-bold text-gray-800">Pengajuan Ditolak</h3>
+                                                    <p class="text-red-600 font-medium">Pilih Tindakan Selanjutnya</p>
+                                                </div>
+                                            </div>
+                                            <div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-times-circle mr-1"></i>
+                                                Ditolak
+                                            </div>
+                                        </div>
+
+                                        <!-- Illustration -->
+                                        <div class="mb-8 relative">
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                                <!-- Background Pattern -->
+                                                <div class="absolute inset-0 opacity-10">
+                                                    <div class="absolute top-4 left-4 w-8 h-8 bg-red-400 rounded-full animate-pulse">
+                                                    </div>
+                                                    <div
+                                                        class="absolute top-12 right-8 w-6 h-6 bg-rose-400 rounded-full animate-pulse delay-150">
+                                                    </div>
+                                                    <div
+                                                        class="absolute bottom-8 left-12 w-4 h-4 bg-red-300 rounded-full animate-pulse delay-300">
+                                                    </div>
+                                                    <div
+                                                        class="absolute bottom-4 right-4 w-10 h-10 bg-rose-300 rounded-full animate-pulse delay-500">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Main Icon -->
+                                                <div class="relative z-10">
+                                                    <svg class="w-24 h-24 text-red-500" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Content -->
+                                        <div class="space-y-4 mb-8">
+                                            <p class="text-gray-600 text-lg leading-relaxed text-center">
+                                                Pengajuan dinas luar Anda sebelumnya tidak dapat disetujui. Anda dapat melakukan
+                                                presensi normal atau mengajukan dinas luar yang baru.
+                                            </p>
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <!-- Button Lapor Presensi -->
+                                            <a href="{{ route('face-detection-page') }}" class="group/btn relative block">
+                                                <div
+                                                    class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl blur opacity-20 group-hover/btn:opacity-30 transition-opacity duration-300">
+                                                </div>
+                                                <div
+                                                    class="relative bg-white border-2 border-blue-200 rounded-xl p-4 hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 group-hover/btn:-translate-y-1">
+                                                    <div class="flex flex-col items-center text-center space-y-3">
+                                                        <div
+                                                            class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                                                            <i class="fas fa-user-check text-white text-lg"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h4 class="font-bold text-gray-800 text-lg">Lapor Presensi</h4>
+                                                            <p class="text-gray-600 text-sm">Lakukan presensi normal di sekolah</p>
+                                                        </div>
+                                                        <div
+                                                            class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 px-4 rounded-lg text-sm font-semibold group-hover/btn:shadow-lg transition-shadow duration-300">
+                                                            Mulai Presensi
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+
+                                            <!-- Button Ajukan Dinas Luar Lagi -->
+                                            <a href="javascript:void(0)" onclick="openDinasLuarModal()" class="group/btn relative block">
+                                                <div
+                                                    class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-xl blur opacity-20 group-hover/btn:opacity-30 transition-opacity duration-300">
+                                                </div>
+                                                <div
+                                                    class="relative bg-white border-2 border-emerald-200 rounded-xl p-4 hover:border-emerald-400 hover:bg-emerald-50 transition-all duration-300 group-hover/btn:-translate-y-1">
+                                                    <div class="flex flex-col items-center text-center space-y-3">
+                                                        <div
+                                                            class="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+                                                            <i class="fas fa-plus-circle text-white text-lg"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h4 class="font-bold text-gray-800 text-lg">Ajukan Lagi</h4>
+                                                            <p class="text-gray-600 text-sm">Buat pengajuan dinas luar baru</p>
+                                                        </div>
+                                                        <div
+                                                            class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-2 px-4 rounded-lg text-sm font-semibold group-hover/btn:shadow-lg transition-shadow duration-300">
+                                                            Ajukan Dinas Luar
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <!-- Info tambahan -->
+                                        <div class="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-info-circle text-gray-500 mr-3"></i>
+                                                <div>
+                                                    <p class="text-gray-700 font-medium text-sm">Tips:</p>
+                                                    <p class="text-gray-600 text-sm">Pastikan alasan dan dokumen pendukung lengkap saat
+                                                        mengajukan dinas luar yang baru</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($dinasLuarStatus == 'disetujui' && $belumLaporKehadiran)
+                        <!-- Card Laporkan Kehadiran (Dinas Luar Disetujui) -->
+                        <div class="lg:col-span-2">
+                            <div class="group relative">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                                </div>
+
+                                <a href="{{ route('face-detection-page') }}" class="relative block">
+                                    <div
+                                        class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-emerald-600 hover:bg-emerald-50 group-hover:-translate-y-2">
+
+                                        <!-- Card Header -->
+                                        <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                            <div class="flex items-center space-x-4">
+                                                <div
+                                                    class="w-14 h-14 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                    <i class="fas fa-user-circle text-white text-xl flex-shrink-0"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-2xl font-bold text-gray-800">Laporkan Kehadiran</h3>
+                                                    <p class="text-emerald-600 font-medium">Dinas Luar Disetujui</p>
+                                                </div>
+                                            </div>
+                                            <div class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                Disetujui
+                                            </div>
+                                        </div>
+
+                                        <!-- Illustration -->
+                                        <div class="mb-8 relative">
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                                <!-- Background Pattern -->
+                                                <div class="absolute inset-0 opacity-10">
+                                                    <div class="absolute top-4 left-4 w-8 h-8 bg-emerald-400 rounded-full"></div>
+                                                    <div class="absolute top-12 right-8 w-6 h-6 bg-cyan-400 rounded-full"></div>
+                                                    <div class="absolute bottom-8 left-12 w-4 h-4 bg-emerald-300 rounded-full"></div>
+                                                    <div class="absolute bottom-4 right-4 w-10 h-10 bg-cyan-300 rounded-full"></div>
+                                                </div>
+
+                                                <!-- Main Icon -->
+                                                <div class="relative z-10">
+                                                    <svg class="w-24 h-24 text-emerald-500" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Content -->
+                                        <div class="space-y-4">
+                                            <p class="text-gray-600 text-lg leading-relaxed">
+                                                Pengajuan dinas luar Anda telah disetujui. Silakan laporkan kehadiran Anda untuk memulai
+                                                aktivitas dinas luar.
+                                            </p>
+                                        </div>
+
+                                        <!-- Action Button -->
+                                        <div class="mt-8">
+                                            <div
+                                                class="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
+                                                Mulai Presensi
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    @elseif($dinasLuarStatus == 'disetujui' && $belumLaporPulang && $isPulangTimeAvailable)
+                        <!-- Card Lapor Pulang (Dinas Luar) -->
+                        <div class="lg:col-span-2">
+                            <div class="group relative">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                                </div>
+
+                                <a href="{{ route('face-detection-page') }}" class="relative block">
+                                    <div
+                                        class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-blue-600 hover:bg-blue-50 group-hover:-translate-y-2">
+
+                                        <!-- Card Header -->
+                                        <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                            <div class="flex items-center space-x-4">
+                                                <div
+                                                    class="w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                    <i class="fas fa-sign-out-alt text-white text-xl flex-shrink-0"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-2xl font-bold text-gray-800">Laporkan Kepulangan</h3>
+                                                    <p class="text-blue-600 font-medium">Dinas Luar Selesai</p>
+                                                </div>
+                                            </div>
+                                            <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-check-circle mr-1"></i>
+                                                Hadir
+                                            </div>
+                                        </div>
+
+                                        <!-- Illustration -->
+                                        <div class="mb-8 relative">
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                                <!-- Background Pattern -->
+                                                <div class="absolute inset-0 opacity-10">
+                                                    <div class="absolute top-4 left-4 w-8 h-8 bg-blue-400 rounded-full"></div>
+                                                    <div class="absolute top-12 right-8 w-6 h-6 bg-indigo-400 rounded-full"></div>
+                                                    <div class="absolute bottom-8 left-12 w-4 h-4 bg-blue-300 rounded-full"></div>
+                                                    <div class="absolute bottom-4 right-4 w-10 h-10 bg-indigo-300 rounded-full"></div>
+                                                </div>
+
+                                                <!-- Main Icon -->
+                                                <div class="relative z-10">
+                                                    <svg class="w-24 h-24 text-blue-500" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Content -->
+                                        <div class="space-y-4">
+                                            <p class="text-gray-600 text-lg leading-relaxed">
+                                                Anda sudah berhasil melaporkan kehadiran untuk dinas luar hari ini. Sekarang laporkan
+                                                kepulangan Anda setelah menyelesaikan aktivitas dinas luar.
+                                            </p>
+                                        </div>
+
+                                        <!-- Action Button -->
+                                        <div class="mt-8">
+                                            <div
+                                                class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
+                                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                                Lapor Pulang
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                    @elseif($dinasLuarStatus == 'disetujui' && $belumLaporPulang && !$isPulangTimeAvailable)
+                        <!-- Card Lapor Pulang Belum Tersedia -->
+                        <div class="lg:col-span-2">
+                            <div class="group relative">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                                </div>
+
+                                <div class="relative">
+                                    <div
+                                        class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-blue-600 hover:bg-blue-50">
+
+                                        <!-- Card Header -->
+                                        <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                            <div class="flex items-center space-x-4">
+                                                <div
+                                                    class="w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                    <i class="fas fa-clock text-white text-xl flex-shrink-0"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-2xl font-bold text-gray-800">Fitur Belum Tersedia</h3>
+                                                    <p class="text-blue-600 font-medium">Lapor Pulang</p>
+                                                </div>
+                                            </div>
+                                            <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Belum Tersedia
+                                            </div>
+                                        </div>
+
+                                        <!-- Illustration -->
+                                        <div class="mb-8 relative">
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                                <!-- Background Pattern -->
+                                                <div class="absolute inset-0 opacity-10">
+                                                    <div class="absolute top-4 left-4 w-8 h-8 bg-blue-400 rounded-full"></div>
+                                                    <div class="absolute top-12 right-8 w-6 h-6 bg-indigo-400 rounded-full"></div>
+                                                    <div class="absolute bottom-8 left-12 w-4 h-4 bg-blue-300 rounded-full"></div>
+                                                    <div class="absolute bottom-4 right-4 w-10 h-10 bg-indigo-300 rounded-full"></div>
+                                                </div>
+
+                                                <!-- Main Icon -->
+                                                <div class="relative z-10">
+                                                    <svg class="w-24 h-24 text-blue-500" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Content -->
+                                        <div class="space-y-4">
+                                            <p class="text-gray-600 text-lg leading-relaxed text-center">
+                                                Fitur lapor pulang hanya tersedia pada jam 13.00 - 18.00. Silakan tunggu hingga waktu
+                                                yang telah ditentukan.
+                                            </p>
+                                        </div>
+
+                                        <!-- Status Info -->
+                                        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-clock text-blue-500 mr-3"></i>
+                                                <div>
+                                                    <p class="text-blue-800 font-medium">Waktu Sekarang: {{ $currentTime }}</p>
+                                                    <p class="text-blue-600 text-sm">Fitur lapor pulang tersedia jam 13.00 - 18.00</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    @elseif($dinasLuarStatus == 'disetujui' && $sudahLaporPulang)
+                        <!-- Card Terimakasih (Dinas Luar) -->
+                        <div class="lg:col-span-2">
+                            <div class="group relative">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                                </div>
+
+                                <div class="relative">
+                                    <div
+                                        class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-green-600 hover:bg-green-50">
+
+                                        <!-- Card Header -->
+                                        <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                            <div class="flex items-center space-x-4">
+                                                <div
+                                                    class="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                    <i class="fas fa-heart text-white text-xl flex-shrink-0"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-2xl font-bold text-gray-800">Terima Kasih!</h3>
+                                                    <p class="text-green-600 font-medium">Dinas Luar Selesai</p>
+                                                </div>
+                                            </div>
+                                            <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                                <i class="fas fa-check-double mr-1"></i>
+                                                Selesai
+                                            </div>
+                                        </div>
+
+                                        <!-- Illustration -->
+                                        <div class="mb-8 relative">
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                                <!-- Background Pattern -->
+                                                <div class="absolute inset-0 opacity-10">
+                                                    <div class="absolute top-4 left-4 w-8 h-8 bg-green-400 rounded-full animate-bounce">
+                                                    </div>
+                                                    <div
+                                                        class="absolute top-12 right-8 w-6 h-6 bg-emerald-400 rounded-full animate-bounce delay-150">
+                                                    </div>
+                                                    <div
+                                                        class="absolute bottom-8 left-12 w-4 h-4 bg-green-300 rounded-full animate-bounce delay-300">
+                                                    </div>
+                                                    <div
+                                                        class="absolute bottom-4 right-4 w-10 h-10 bg-emerald-300 rounded-full animate-bounce delay-500">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Main Icon -->
+                                                <div class="relative z-10">
+                                                    <svg class="w-24 h-24 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Content -->
+                                        <div class="space-y-6 text-center">
+                                            <h4 class="text-3xl font-bold text-gray-800">Terima kasih sudah bekerja keras hari ini!</h4>
+                                            <p class="text-gray-600 text-lg leading-relaxed">
+                                                Anda telah menyelesaikan dinas luar dan absensi untuk hari ini. Selamat beristirahat dan
+                                                sampai jumpa besok.
+                                            </p>
+
+                                            <!-- Achievement Badge -->
+                                            <div
+                                                class="inline-flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-full text-lg font-semibold">
+                                                <i class="fas fa-trophy mr-2 text-yellow-500"></i>
+                                                Dinas Luar Hari Ini Selesai
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                @elseif($isBeforeAttendanceTime)
+                    <!-- Card Before 6:30 -->
                     <div class="lg:col-span-2">
                         <div class="group relative">
                             <div
-                                class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                                class="absolute inset-0 bg-gradient-to-r from-gray-400 to-blue-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
                             </div>
 
-                            <a href="{{ route('face-detection-page') }}" class="relative block">
+                            <div class="relative">
                                 <div
-                                    class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-emerald-600 hover:bg-emerald-50 group-hover:-translate-y-2">
+                                    class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-blue-600 hover:bg-blue-50">
 
                                     <!-- Card Header -->
                                     <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
                                         <div class="flex items-center space-x-4">
                                             <div
-                                                class="w-14 h-14 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                                                <i class="fas fa-user-circle text-white text-xl flex-shrink-0"></i>
+                                                class="w-14 h-14 bg-gradient-to-r from-gray-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                <i class="fas fa-clock text-white text-xl flex-shrink-0"></i>
                                             </div>
                                             <div>
-                                                <h3 class="text-2xl font-bold text-gray-800">Laporkan Kehadiran</h3>
-                                                <p class="text-emerald-600 font-medium">Dinas Luar Disetujui</p>
+                                                <h3 class="text-2xl font-bold text-gray-800">Fitur Belum Tersedia</h3>
+                                                <p class="text-blue-600 font-medium">Presensi Kehadiran</p>
                                             </div>
                                         </div>
-                                        <div class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                            <i class="fas fa-check-circle mr-1"></i>
-                                            Disetujui
+                                        <div class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            Informasi
                                         </div>
                                     </div>
 
                                     <!-- Illustration -->
                                     <div class="mb-8 relative">
                                         <div
-                                            class="w-full h-48 bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                            class="w-full h-48 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl flex items-center justify-center relative overflow-hidden">
                                             <!-- Background Pattern -->
                                             <div class="absolute inset-0 opacity-10">
-                                                <div class="absolute top-4 left-4 w-8 h-8 bg-emerald-400 rounded-full"></div>
-                                                <div class="absolute top-12 right-8 w-6 h-6 bg-cyan-400 rounded-full"></div>
-                                                <div class="absolute bottom-8 left-12 w-4 h-4 bg-emerald-300 rounded-full"></div>
-                                                <div class="absolute bottom-4 right-4 w-10 h-10 bg-cyan-300 rounded-full"></div>
+                                                <div class="absolute top-4 left-4 w-8 h-8 bg-gray-400 rounded-full"></div>
+                                                <div class="absolute top-12 right-8 w-6 h-6 bg-blue-400 rounded-full"></div>
+                                                <div class="absolute bottom-8 left-12 w-4 h-4 bg-gray-300 rounded-full"></div>
+                                                <div class="absolute bottom-4 right-4 w-10 h-10 bg-blue-300 rounded-full"></div>
                                             </div>
 
                                             <!-- Main Icon -->
                                             <div class="relative z-10">
-                                                <svg class="w-24 h-24 text-emerald-500" fill="none" stroke="currentColor"
+                                                <svg class="w-24 h-24 text-gray-500" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -164,25 +784,239 @@
 
                                     <!-- Card Content -->
                                     <div class="space-y-4">
+                                        <p class="text-gray-600 text-lg leading-relaxed text-center">
+                                            Fitur lapor kehadiran tersedia mulai jam 06.30 - 07.15. Silakan kembali pada waktu yang
+                                            telah ditentukan.
+                                        </p>
+                                    </div>
+
+                                    <!-- Status Info -->
+                                    <div class="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock text-gray-500 mr-3"></i>
+                                            <div>
+                                                <p class="text-gray-800 font-medium">Waktu Sekarang: {{ $currentTime }}</p>
+                                                <p class="text-gray-600 text-sm">Presensi kehadiran belum dibuka</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                @elseif($isAfterAttendanceTime && !$presensiHariIni && !$dinasLuarHariIni)
+                    <!-- Card After 7:15 with no attendance or dinas luar -->
+                    <div class="lg:col-span-2">
+                        <div class="group relative">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-red-400 to-orange-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                            </div>
+
+                            <div class="relative">
+                                <div
+                                    class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-red-600 hover:bg-red-50">
+
+                                    <!-- Card Header -->
+                                    <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
+                                        <div class="flex items-center space-x-4">
+                                            <div
+                                                class="w-14 h-14 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                <i class="fas fa-times-circle text-white text-xl flex-shrink-0"></i>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-2xl font-bold text-gray-800">Fitur Tidak Tersedia</h3>
+                                                <p class="text-red-600 font-medium">Presensi Kehadiran</p>
+                                            </div>
+                                        </div>
+                                        <div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>
+                                            Tidak Tersedia
+                                        </div>
+                                    </div>
+
+                                    <!-- Illustration -->
+                                    <div class="mb-8 relative">
+                                        <div
+                                            class="w-full h-48 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                            <!-- Background Pattern -->
+                                            <div class="absolute inset-0 opacity-10">
+                                                <div class="absolute top-4 left-4 w-8 h-8 bg-red-400 rounded-full"></div>
+                                                <div class="absolute top-12 right-8 w-6 h-6 bg-orange-400 rounded-full"></div>
+                                                <div class="absolute bottom-8 left-12 w-4 h-4 bg-red-300 rounded-full"></div>
+                                                <div class="absolute bottom-4 right-4 w-10 h-10 bg-orange-300 rounded-full"></div>
+                                            </div>
+
+                                            <!-- Main Icon -->
+                                            <div class="relative z-10">
+                                                <svg class="w-24 h-24 text-red-500" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                        d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Card Content -->
+                                    <div class="space-y-4">
+                                        <p class="text-gray-600 text-lg leading-relaxed text-center">
+                                            Waktu lapor kehadiran telah berakhir (06.30 - 07.15). Anda belum melaporkan kehadiran
+                                            atau mengajukan dinas luar hari ini.
+                                        </p>
+                                    </div>
+
+                                    <!-- Status Info -->
+                                    <div class="mt-8 bg-red-50 border border-red-200 rounded-lg p-4">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-clock text-red-500 mr-3"></i>
+                                            <div>
+                                                <p class="text-red-800 font-medium">Waktu Sekarang: {{ $currentTime }}</p>
+                                                <p class="text-red-600 text-sm">Batas waktu lapor kehadiran telah lewat</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                @elseif($belumLaporKehadiran && $isAttendanceTimeAvailable)
+                    <!-- Laporkan Kehadiran Card -->
+                    <div class="group relative {{ Auth::user()->role == 'kepsek' ? 'col-span-full' : '' }}">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                        </div>
+
+                        <a href="{{ route('face-detection-page') }}" class="relative block">
+                            <div
+                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-emerald-600 hover:bg-emerald-50 group-hover:-translate-y-2">
+
+                                <!-- Card Header -->
+                                <div class="flex items-center justify-between mb-8">
+                                    <div class="flex items-center space-x-4">
+                                        <div
+                                            class="w-14 h-14 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-user-circle text-white text-xl flex-shrink-0"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-2xl font-bold text-gray-800">Laporkan Kehadiran</h3>
+                                            <p class="text-emerald-600 font-medium">Absensi Harian</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Illustration -->
+                                <div class="mb-8 relative">
+                                    <div
+                                        class="w-full h-48 bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                        <!-- Background Pattern -->
+                                        <div class="absolute inset-0 opacity-10">
+                                            <div class="absolute top-4 left-4 w-8 h-8 bg-emerald-400 rounded-full"></div>
+                                            <div class="absolute top-12 right-8 w-6 h-6 bg-cyan-400 rounded-full"></div>
+                                            <div class="absolute bottom-8 left-12 w-4 h-4 bg-emerald-300 rounded-full"></div>
+                                            <div class="absolute bottom-4 right-4 w-10 h-10 bg-cyan-300 rounded-full"></div>
+                                        </div>
+
+                                        <!-- Main Icon -->
+                                        <div class="relative z-10">
+                                            <svg class="w-24 h-24 text-emerald-500" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card Content -->
+                                <div class="space-y-4">
+                                    <p class="text-gray-600 text-lg leading-relaxed">
+                                        Laporkan kehadiran Anda di sekolah untuk hari ini. Sistem akan mengecek wajah Anda.
+                                    </p>
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="mt-8">
+                                    <div
+                                        class="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
+                                        Mulai Presensi
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    @if (Auth::user()->role == 'guru')
+                        <!-- Laporkan Dinas Luar Card -->
+                        <div class="group relative">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
+                            </div>
+
+                            <a href="javascript:void(0)" onclick="openDinasLuarModal()" class="relative block">
+                                <div
+                                    class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:border-purple-600 hover:bg-purple-100 hover:shadow-3xl group-hover:-translate-y-2">
+
+                                    <!-- Card Header -->
+                                    <div class="flex items-center justify-between mb-8">
+                                        <div class="flex items-center space-x-4">
+                                            <div
+                                                class="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                                                <i class="fas fa-location text-white text-xl flex-shrink-0"></i>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-2xl font-bold text-gray-800">Laporkan Dinas Luar</h3>
+                                                <p class="text-purple-600 font-medium">Tugas Eksternal</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Illustration -->
+                                    <div class="mb-8 relative">
+                                        <div
+                                            class="w-full h-48 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl flex items-center justify-center relative overflow-hidden">
+                                            <!-- Background Pattern -->
+                                            <div class="absolute inset-0 opacity-10">
+                                                <div class="absolute top-4 left-4 w-8 h-8 bg-purple-400 rounded-full"></div>
+                                                <div class="absolute top-12 right-8 w-6 h-6 bg-pink-400 rounded-full"></div>
+                                                <div class="absolute bottom-8 left-12 w-4 h-4 bg-purple-300 rounded-full"></div>
+                                                <div class="absolute bottom-4 right-4 w-10 h-10 bg-pink-300 rounded-full"></div>
+                                            </div>
+
+                                            <!-- Main Icon -->
+                                            <div class="relative z-10">
+                                                <svg class="w-24 h-24 text-purple-500" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Card Content -->
+                                    <div class="space-y-4">
                                         <p class="text-gray-600 text-lg leading-relaxed">
-                                            Pengajuan dinas luar Anda telah disetujui. Silakan laporkan kehadiran Anda untuk memulai
-                                            aktivitas dinas luar.
+                                            Laporkan pengajuan aktivitas dinas luar yang dilakukan di luar lingkungan sekolah.
                                         </p>
                                     </div>
 
                                     <!-- Action Button -->
                                     <div class="mt-8">
                                         <div
-                                            class="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
-                                            Mulai Presensi
+                                            class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
+                                            Buat Laporan
                                         </div>
                                     </div>
                                 </div>
                             </a>
-                        </div>
-                    </div>
-                @elseif($dinasLuarStatus == 'disetujui' && $belumLaporPulang && $isPulangTimeAvailable)
-                    <!-- Card Lapor Pulang (Dinas Luar) -->
+                        </div>    
+                    @endif
+
+                @elseif($belumLaporPulang && $isPulangTimeAvailable)
+                    <!-- Card Lapor Pulang -->
                     <div class="lg:col-span-2">
                         <div class="group relative">
                             <div
@@ -202,7 +1036,7 @@
                                             </div>
                                             <div>
                                                 <h3 class="text-2xl font-bold text-gray-800">Laporkan Kepulangan</h3>
-                                                <p class="text-blue-600 font-medium">Dinas Luar Selesai</p>
+                                                <p class="text-blue-600 font-medium">Absensi Keluar</p>
                                             </div>
                                         </div>
                                         <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
@@ -238,8 +1072,8 @@
                                     <!-- Card Content -->
                                     <div class="space-y-4">
                                         <p class="text-gray-600 text-lg leading-relaxed">
-                                            Anda sudah berhasil melaporkan kehadiran untuk dinas luar hari ini. Sekarang laporkan
-                                            kepulangan Anda setelah menyelesaikan aktivitas dinas luar.
+                                            Anda sudah berhasil melaporkan kehadiran hari ini. Sekarang laporkan kepulangan Anda
+                                            sebelum meninggalkan sekolah.
                                         </p>
                                     </div>
 
@@ -256,7 +1090,7 @@
                         </div>
                     </div>
 
-                @elseif($dinasLuarStatus == 'disetujui' && $belumLaporPulang && !$isPulangTimeAvailable)
+                @elseif($belumLaporPulang && !$isPulangTimeAvailable)
                     <!-- Card Lapor Pulang Belum Tersedia -->
                     <div class="lg:col-span-2">
                         <div class="group relative">
@@ -312,7 +1146,8 @@
                                     <!-- Card Content -->
                                     <div class="space-y-4">
                                         <p class="text-gray-600 text-lg leading-relaxed text-center">
-                                            Fitur lapor pulang hanya tersedia pada jam 13.00 - 18.00. Silakan tunggu hingga waktu yang telah ditentukan.
+                                            Fitur lapor pulang hanya tersedia pada jam 13.00 - 18.00. Silakan tunggu hingga waktu
+                                            yang telah ditentukan.
                                         </p>
                                     </div>
 
@@ -331,8 +1166,8 @@
                         </div>
                     </div>
 
-                @elseif($dinasLuarStatus == 'disetujui' && $sudahLaporPulang)
-                    <!-- Card Terimakasih (Dinas Luar) -->
+                @elseif($sudahLaporPulang)
+                    <!-- Card Terimakasih -->
                     <div class="lg:col-span-2">
                         <div class="group relative">
                             <div
@@ -352,7 +1187,7 @@
                                             </div>
                                             <div>
                                                 <h3 class="text-2xl font-bold text-gray-800">Terima Kasih!</h3>
-                                                <p class="text-green-600 font-medium">Dinas Luar Selesai</p>
+                                                <p class="text-green-600 font-medium">Absensi Selesai</p>
                                             </div>
                                         </div>
                                         <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
@@ -394,15 +1229,15 @@
                                     <div class="space-y-6 text-center">
                                         <h4 class="text-3xl font-bold text-gray-800">Terima kasih sudah bekerja keras hari ini!</h4>
                                         <p class="text-gray-600 text-lg leading-relaxed">
-                                            Anda telah menyelesaikan dinas luar dan absensi untuk hari ini. Selamat beristirahat dan
-                                            sampai jumpa besok.
+                                            Anda telah menyelesaikan absensi untuk hari ini. Selamat beristirahat dan sampai jumpa
+                                            besok.
                                         </p>
 
                                         <!-- Achievement Badge -->
                                         <div
                                             class="inline-flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-full text-lg font-semibold">
                                             <i class="fas fa-trophy mr-2 text-yellow-500"></i>
-                                            Dinas Luar Hari Ini Selesai
+                                            Absensi Hari Ini Selesai
                                         </div>
                                     </div>
                                 </div>
@@ -410,520 +1245,8 @@
                         </div>
                     </div>
                 @endif
-
-            @elseif($isBeforeAttendanceTime)
-                <!-- Card Before 6:30 -->
-                <div class="lg:col-span-2">
-                    <div class="group relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-gray-400 to-blue-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                        </div>
-
-                        <div class="relative">
-                            <div
-                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-blue-600 hover:bg-blue-50">
-
-                                <!-- Card Header -->
-                                <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
-                                    <div class="flex items-center space-x-4">
-                                        <div
-                                            class="w-14 h-14 bg-gradient-to-r from-gray-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-clock text-white text-xl flex-shrink-0"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800">Fitur Belum Tersedia</h3>
-                                            <p class="text-blue-600 font-medium">Presensi Kehadiran</p>
-                                        </div>
-                                    </div>
-                                    <div class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        Informasi
-                                    </div>
-                                </div>
-
-                                <!-- Illustration -->
-                                <div class="mb-8 relative">
-                                    <div
-                                        class="w-full h-48 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                        <!-- Background Pattern -->
-                                        <div class="absolute inset-0 opacity-10">
-                                            <div class="absolute top-4 left-4 w-8 h-8 bg-gray-400 rounded-full"></div>
-                                            <div class="absolute top-12 right-8 w-6 h-6 bg-blue-400 rounded-full"></div>
-                                            <div class="absolute bottom-8 left-12 w-4 h-4 bg-gray-300 rounded-full"></div>
-                                            <div class="absolute bottom-4 right-4 w-10 h-10 bg-blue-300 rounded-full"></div>
-                                        </div>
-
-                                        <!-- Main Icon -->
-                                        <div class="relative z-10">
-                                            <svg class="w-24 h-24 text-gray-500" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card Content -->
-                                <div class="space-y-4">
-                                    <p class="text-gray-600 text-lg leading-relaxed text-center">
-                                        Fitur lapor kehadiran tersedia mulai jam 06.30 - 07.15. Silakan kembali pada waktu yang
-                                        telah ditentukan.
-                                    </p>
-                                </div>
-
-                                <!-- Status Info -->
-                                <div class="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-clock text-gray-500 mr-3"></i>
-                                        <div>
-                                            <p class="text-gray-800 font-medium">Waktu Sekarang: {{ $currentTime }}</p>
-                                            <p class="text-gray-600 text-sm">Presensi kehadiran belum dibuka</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            @elseif($isAfterAttendanceTime && !$presensiHariIni && !$dinasLuarHariIni)
-                <!-- Card After 7:15 with no attendance or dinas luar -->
-                <div class="lg:col-span-2">
-                    <div class="group relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-red-400 to-orange-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                        </div>
-
-                        <div class="relative">
-                            <div
-                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-red-600 hover:bg-red-50">
-
-                                <!-- Card Header -->
-                                <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
-                                    <div class="flex items-center space-x-4">
-                                        <div
-                                            class="w-14 h-14 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-times-circle text-white text-xl flex-shrink-0"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800">Fitur Tidak Tersedia</h3>
-                                            <p class="text-red-600 font-medium">Presensi Kehadiran</p>
-                                        </div>
-                                    </div>
-                                    <div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                        <i class="fas fa-exclamation-circle mr-1"></i>
-                                        Tidak Tersedia
-                                    </div>
-                                </div>
-
-                                <!-- Illustration -->
-                                <div class="mb-8 relative">
-                                    <div
-                                        class="w-full h-48 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                        <!-- Background Pattern -->
-                                        <div class="absolute inset-0 opacity-10">
-                                            <div class="absolute top-4 left-4 w-8 h-8 bg-red-400 rounded-full"></div>
-                                            <div class="absolute top-12 right-8 w-6 h-6 bg-orange-400 rounded-full"></div>
-                                            <div class="absolute bottom-8 left-12 w-4 h-4 bg-red-300 rounded-full"></div>
-                                            <div class="absolute bottom-4 right-4 w-10 h-10 bg-orange-300 rounded-full"></div>
-                                        </div>
-
-                                        <!-- Main Icon -->
-                                        <div class="relative z-10">
-                                            <svg class="w-24 h-24 text-red-500" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card Content -->
-                                <div class="space-y-4">
-                                    <p class="text-gray-600 text-lg leading-relaxed text-center">
-                                        Waktu lapor kehadiran telah berakhir (06.30 - 07.15). Anda belum melaporkan kehadiran
-                                        atau mengajukan dinas luar hari ini.
-                                    </p>
-                                </div>
-
-                                <!-- Status Info -->
-                                <div class="mt-8 bg-red-50 border border-red-200 rounded-lg p-4">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-clock text-red-500 mr-3"></i>
-                                        <div>
-                                            <p class="text-red-800 font-medium">Waktu Sekarang: {{ $currentTime }}</p>
-                                            <p class="text-red-600 text-sm">Batas waktu lapor kehadiran telah lewat</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            @elseif($belumLaporKehadiran && $isAttendanceTimeAvailable)
-                <!-- Laporkan Kehadiran Card -->
-                <div class="group relative">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                    </div>
-
-                    <a href="{{ route('face-detection-page') }}" class="relative block">
-                        <div
-                            class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-emerald-600 hover:bg-emerald-50 group-hover:-translate-y-2">
-
-                            <!-- Card Header -->
-                            <div class="flex items-center justify-between mb-8">
-                                <div class="flex items-center space-x-4">
-                                    <div
-                                        class="w-14 h-14 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                                        <i class="fas fa-user-circle text-white text-xl flex-shrink-0"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-2xl font-bold text-gray-800">Laporkan Kehadiran</h3>
-                                        <p class="text-emerald-600 font-medium">Absensi Harian</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Illustration -->
-                            <div class="mb-8 relative">
-                                <div
-                                    class="w-full h-48 bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                    <!-- Background Pattern -->
-                                    <div class="absolute inset-0 opacity-10">
-                                        <div class="absolute top-4 left-4 w-8 h-8 bg-emerald-400 rounded-full"></div>
-                                        <div class="absolute top-12 right-8 w-6 h-6 bg-cyan-400 rounded-full"></div>
-                                        <div class="absolute bottom-8 left-12 w-4 h-4 bg-emerald-300 rounded-full"></div>
-                                        <div class="absolute bottom-4 right-4 w-10 h-10 bg-cyan-300 rounded-full"></div>
-                                    </div>
-
-                                    <!-- Main Icon -->
-                                    <div class="relative z-10">
-                                        <svg class="w-24 h-24 text-emerald-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card Content -->
-                            <div class="space-y-4">
-                                <p class="text-gray-600 text-lg leading-relaxed">
-                                    Laporkan kehadiran Anda di sekolah untuk hari ini. Sistem akan mengecek wajah Anda.
-                                </p>
-                            </div>
-
-                            <!-- Action Button -->
-                            <div class="mt-8">
-                                <div
-                                    class="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
-                                    Mulai Presensi
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Laporkan Dinas Luar Card -->
-                <div class="group relative">
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                    </div>
-
-                    <a href="javascript:void(0)" onclick="openDinasLuarModal()" class="relative block">
-                        <div
-                            class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:border-purple-600 hover:bg-purple-100 hover:shadow-3xl group-hover:-translate-y-2">
-
-                            <!-- Card Header -->
-                            <div class="flex items-center justify-between mb-8">
-                                <div class="flex items-center space-x-4">
-                                    <div
-                                        class="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
-                                        <i class="fas fa-location text-white text-xl flex-shrink-0"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-2xl font-bold text-gray-800">Laporkan Dinas Luar</h3>
-                                        <p class="text-purple-600 font-medium">Tugas Eksternal</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Illustration -->
-                            <div class="mb-8 relative">
-                                <div
-                                    class="w-full h-48 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                    <!-- Background Pattern -->
-                                    <div class="absolute inset-0 opacity-10">
-                                        <div class="absolute top-4 left-4 w-8 h-8 bg-purple-400 rounded-full"></div>
-                                        <div class="absolute top-12 right-8 w-6 h-6 bg-pink-400 rounded-full"></div>
-                                        <div class="absolute bottom-8 left-12 w-4 h-4 bg-purple-300 rounded-full"></div>
-                                        <div class="absolute bottom-4 right-4 w-10 h-10 bg-pink-300 rounded-full"></div>
-                                    </div>
-
-                                    <!-- Main Icon -->
-                                    <div class="relative z-10">
-                                        <svg class="w-24 h-24 text-purple-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card Content -->
-                            <div class="space-y-4">
-                                <p class="text-gray-600 text-lg leading-relaxed">
-                                    Laporkan pengajuan aktivitas dinas luar yang dilakukan di luar lingkungan sekolah.
-                                </p>
-                            </div>
-
-                            <!-- Action Button -->
-                            <div class="mt-8">
-                                <div
-                                    class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
-                                    Buat Laporan
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-            @elseif($belumLaporPulang && $isPulangTimeAvailable)
-                <!-- Card Lapor Pulang -->
-                <div class="lg:col-span-2">
-                    <div class="group relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                        </div>
-
-                        <a href="{{ route('face-detection-page') }}" class="relative block">
-                            <div
-                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-blue-600 hover:bg-blue-50 group-hover:-translate-y-2">
-
-                                <!-- Card Header -->
-                                <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
-                                    <div class="flex items-center space-x-4">
-                                        <div
-                                            class="w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-sign-out-alt text-white text-xl flex-shrink-0"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800">Laporkan Kepulangan</h3>
-                                            <p class="text-blue-600 font-medium">Absensi Keluar</p>
-                                        </div>
-                                    </div>
-                                    <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                        <i class="fas fa-check-circle mr-1"></i>
-                                        Hadir
-                                    </div>
-                                </div>
-
-                                <!-- Illustration -->
-                                <div class="mb-8 relative">
-                                    <div
-                                        class="w-full h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                        <!-- Background Pattern -->
-                                        <div class="absolute inset-0 opacity-10">
-                                            <div class="absolute top-4 left-4 w-8 h-8 bg-blue-400 rounded-full"></div>
-                                            <div class="absolute top-12 right-8 w-6 h-6 bg-indigo-400 rounded-full"></div>
-                                            <div class="absolute bottom-8 left-12 w-4 h-4 bg-blue-300 rounded-full"></div>
-                                            <div class="absolute bottom-4 right-4 w-10 h-10 bg-indigo-300 rounded-full"></div>
-                                        </div>
-
-                                        <!-- Main Icon -->
-                                        <div class="relative z-10">
-                                            <svg class="w-24 h-24 text-blue-500" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                                </path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card Content -->
-                                <div class="space-y-4">
-                                    <p class="text-gray-600 text-lg leading-relaxed">
-                                        Anda sudah berhasil melaporkan kehadiran hari ini. Sekarang laporkan kepulangan Anda
-                                        sebelum meninggalkan sekolah.
-                                    </p>
-                                </div>
-
-                                <!-- Action Button -->
-                                <div class="mt-8">
-                                    <div
-                                        class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3 px-6 rounded-xl font-semibold text-lg shadow-lg group-hover:shadow-xl transition-all duration-300 text-center">
-                                        <i class="fas fa-sign-out-alt mr-2"></i>
-                                        Lapor Pulang
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            
-            @elseif($belumLaporPulang && !$isPulangTimeAvailable)
-                <!-- Card Lapor Pulang Belum Tersedia -->
-                <div class="lg:col-span-2">
-                    <div class="group relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                        </div>
-
-                        <div class="relative">
-                            <div
-                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-blue-600 hover:bg-blue-50">
-
-                                <!-- Card Header -->
-                                <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
-                                    <div class="flex items-center space-x-4">
-                                        <div
-                                            class="w-14 h-14 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-clock text-white text-xl flex-shrink-0"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800">Fitur Belum Tersedia</h3>
-                                            <p class="text-blue-600 font-medium">Lapor Pulang</p>
-                                        </div>
-                                    </div>
-                                    <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        Belum Tersedia
-                                    </div>
-                                </div>
-
-                                <!-- Illustration -->
-                                <div class="mb-8 relative">
-                                    <div
-                                        class="w-full h-48 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                        <!-- Background Pattern -->
-                                        <div class="absolute inset-0 opacity-10">
-                                            <div class="absolute top-4 left-4 w-8 h-8 bg-blue-400 rounded-full"></div>
-                                            <div class="absolute top-12 right-8 w-6 h-6 bg-indigo-400 rounded-full"></div>
-                                            <div class="absolute bottom-8 left-12 w-4 h-4 bg-blue-300 rounded-full"></div>
-                                            <div class="absolute bottom-4 right-4 w-10 h-10 bg-indigo-300 rounded-full"></div>
-                                        </div>
-
-                                        <!-- Main Icon -->
-                                        <div class="relative z-10">
-                                            <svg class="w-24 h-24 text-blue-500" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card Content -->
-                                <div class="space-y-4">
-                                    <p class="text-gray-600 text-lg leading-relaxed text-center">
-                                        Fitur lapor pulang hanya tersedia pada jam 13.00 - 18.00. Silakan tunggu hingga waktu yang telah ditentukan.
-                                    </p>
-                                </div>
-
-                                <!-- Status Info -->
-                                <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-clock text-blue-500 mr-3"></i>
-                                        <div>
-                                            <p class="text-blue-800 font-medium">Waktu Sekarang: {{ $currentTime }}</p>
-                                            <p class="text-blue-600 text-sm">Fitur lapor pulang tersedia jam 13.00 - 18.00</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            @elseif($sudahLaporPulang)
-                <!-- Card Terimakasih -->
-                <div class="lg:col-span-2">
-                    <div class="group relative">
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500">
-                        </div>
-
-                        <div class="relative">
-                            <div
-                                class="bg-white rounded-xl p-6 shadow-2xl border border-gray-100 transform transition-all duration-500 hover:shadow-3xl hover:border-green-600 hover:bg-green-50">
-
-                                <!-- Card Header -->
-                                <div class="flex flex-col md:flex-row gap-5 items-start md:items-center justify-between mb-8">
-                                    <div class="flex items-center space-x-4">
-                                        <div
-                                            class="w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                                            <i class="fas fa-heart text-white text-xl flex-shrink-0"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="text-2xl font-bold text-gray-800">Terima Kasih!</h3>
-                                            <p class="text-green-600 font-medium">Absensi Selesai</p>
-                                        </div>
-                                    </div>
-                                    <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                        <i class="fas fa-check-double mr-1"></i>
-                                        Selesai
-                                    </div>
-                                </div>
-
-                                <!-- Illustration -->
-                                <div class="mb-8 relative">
-                                    <div
-                                        class="w-full h-48 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl flex items-center justify-center relative overflow-hidden">
-                                        <!-- Background Pattern -->
-                                        <div class="absolute inset-0 opacity-10">
-                                            <div class="absolute top-4 left-4 w-8 h-8 bg-green-400 rounded-full animate-bounce">
-                                            </div>
-                                            <div
-                                                class="absolute top-12 right-8 w-6 h-6 bg-emerald-400 rounded-full animate-bounce delay-150">
-                                            </div>
-                                            <div
-                                                class="absolute bottom-8 left-12 w-4 h-4 bg-green-300 rounded-full animate-bounce delay-300">
-                                            </div>
-                                            <div
-                                                class="absolute bottom-4 right-4 w-10 h-10 bg-emerald-300 rounded-full animate-bounce delay-500">
-                                            </div>
-                                        </div>
-
-                                        <!-- Main Icon -->
-                                        <div class="relative z-10">
-                                            <svg class="w-24 h-24 text-green-500" fill="currentColor" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card Content -->
-                                <div class="space-y-6 text-center">
-                                    <h4 class="text-3xl font-bold text-gray-800">Terima kasih sudah bekerja keras hari ini!</h4>
-                                    <p class="text-gray-600 text-lg leading-relaxed">
-                                        Anda telah menyelesaikan absensi untuk hari ini. Selamat beristirahat dan sampai jumpa
-                                        besok.
-                                    </p>
-
-                                    <!-- Achievement Badge -->
-                                    <div
-                                        class="inline-flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-full text-lg font-semibold">
-                                        <i class="fas fa-trophy mr-2 text-yellow-500"></i>
-                                        Absensi Hari Ini Selesai
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             @endif
+
 
         </div>
     </div>

@@ -42,6 +42,20 @@ class UserSeeder extends Seeder
                 'password' => 'karin123',
                 'role' => 'guru',
             ],
+            [
+                'name' => 'Prabowo Widodo',
+                'nip' => '12345678939',
+                'email' => 'prabowo@gmail.com',
+                'password' => 'prabowo123',
+                'role' => 'kepsek',
+            ],
+            [
+                'name' => 'Jokowi Kurniawan',
+                'nip' => '12345678943240',
+                'email' => 'jokowi@gmail.com',
+                'password' => 'jokowi123',
+                'role' => 'admin',
+            ]
         ];
         
         foreach ($user as $value) {

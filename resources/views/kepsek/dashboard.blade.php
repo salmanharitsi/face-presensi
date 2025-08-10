@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.kepsek')
 
-@section('title', 'Guru dashboard')
+@section('title', 'Kepala Sekolah dashboard')
 
 @section('content')
 @php
@@ -45,11 +45,10 @@
     $totalPresensi = $totalHadir + $totalHadirDl + $totalHadirTidakLaporPulang + $totalTidakHadir;
     $persentaseHadir = $totalPresensi > 0 ? round((($totalHadir + $totalHadirDl + $totalHadirTidakLaporPulang) / $totalPresensi) * 100, 1) : 0;
 
-    // Monthly
     $thisMonth = Carbon::now()->startOfMonth();
     $monthlyHadir = $user->presensi()->whereIn('status', ['hadir', 'hadir-dl', 'hadir-tidak-lapor-pulang'])->where('tanggal', '>=', $thisMonth)->count();
 
-    // Weekly Chart Data (Monday–Saturday)
+    // Weekly Chart
     $weeklyLabels = [];
     $weeklyData = [];
     $daysBack = 0;
@@ -58,7 +57,6 @@
 
     while ($workDaysFound < 6 && $daysBack < 14) {
         $date = $today->copy()->subDays($daysBack);
-
         if ($date->dayOfWeek >= 1 && $date->dayOfWeek <= 6) {
             $attendance = $user->presensi()->whereDate('tanggal', $date)->first();
             $isHadir = $attendance && in_array($attendance->status, ['hadir', 'hadir-dl', 'hadir-tidak-lapor-pulang']);
@@ -77,7 +75,7 @@
             <h1 class="text-3xl font-bold mb-2">Selamat Datang Kembali! 👋</h1>
             <p class="text-primary-100 text-lg mb-6">Laporkan kehadiran Anda dengan mudah dan cepat</p>
             <a href="{{ route('presensi-guru') }}"
-                class="bg-white text-primary-600 px-6 py-3 rounded-xl font-semibold hover:bg-primary-50 transition-colors hover-lift">
+               class="bg-white text-primary-600 px-6 py-3 rounded-xl font-semibold hover:bg-primary-50 transition-colors hover-lift">
                 Mulai Sekarang
             </a>
         </div>
@@ -158,23 +156,11 @@
         <div class="flex items-center justify-center" style="height: 300px;">
             <canvas id="attendanceChart"></canvas>
         </div>
-        <div class="flex justify-center space-x-6 mt-4 flex-wrap">
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Hadir ({{ $totalHadir }})</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                <span class="text-sm text-gray-600">Hadir - DL ({{ $totalHadirDl }})</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
-                <span class="text-sm text-gray-600">Hadir - Tidak Lapor Pulang ({{ $totalHadirTidakLaporPulang }})</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Tidak Hadir ({{ $totalTidakHadir }})</span>
-            </div>
+        <div class="flex justify-center space-x-4 mt-4 flex-wrap text-sm text-gray-600">
+            <div class="flex items-center space-x-2"><div class="w-3 h-3 bg-green-500 rounded-full"></div><span>Hadir ({{ $totalHadir }})</span></div>
+            <div class="flex items-center space-x-2"><div class="w-3 h-3 bg-yellow-400 rounded-full"></div><span>Hadir - DL ({{ $totalHadirDl }})</span></div>
+            <div class="flex items-center space-x-2"><div class="w-3 h-3 bg-blue-400 rounded-full"></div><span>Hadir - Tidak Lapor Pulang ({{ $totalHadirTidakLaporPulang }})</span></div>
+            <div class="flex items-center space-x-2"><div class="w-3 h-3 bg-red-500 rounded-full"></div><span>Tidak Hadir ({{ $totalTidakHadir }})</span></div>
         </div>
     </div>
 
@@ -187,10 +173,11 @@
     </div>
 </div>
 
-<!-- Chart.js Scripts -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // PIE Chart
         const ctx1 = document.getElementById('attendanceChart');
         if (ctx1) {
             new Chart(ctx1, {
@@ -205,7 +192,6 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
                     plugins: {
                         legend: {
                             display: true,
@@ -217,6 +203,7 @@
             });
         }
 
+        // WEEKLY Chart
         const ctx2 = document.getElementById('weeklyChart');
         if (ctx2) {
             new Chart(ctx2, {
@@ -227,28 +214,24 @@
                         label: 'Kehadiran',
                         data: {!! json_encode($weeklyData) !!},
                         backgroundColor: '#3B82F6',
-                        borderRadius: 4
+                        borderRadius: 6
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
                     scales: {
                         y: {
                             beginAtZero: true,
                             max: 1,
                             ticks: {
                                 stepSize: 1,
-                                callback: function (value) {
-                                    return value === 1 ? 'Hadir' : value === 0 ? 'Tidak Hadir' : '';
+                                callback: function(value) {
+                                    return value === 1 ? 'Hadir' : 'Tidak Hadir';
                                 }
                             }
                         }
                     },
                     plugins: {
-                        legend: {
-                            display: false
-                        }
+                        legend: { display: false }
                     }
                 }
             });

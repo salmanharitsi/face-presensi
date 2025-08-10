@@ -7,6 +7,31 @@ use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
 {
+    private function get_auth_user()
+    {
+        $user = Auth::user();
+
+        if(!$user || !in_array($user->role, haystack: ['guru', 'kepsek', 'admin'])) {
+            abort(403, 'Unauthorized access');
+        }
+
+        switch ($user->role) {
+            case 'guru':
+                $layout = 'layouts.app';
+                break;
+            case 'kepsek':
+                $layout = 'layouts.kepsek';
+                break;
+            case 'admin':
+                $layout = 'layouts.admin';
+                break;
+            default:
+                abort(403, 'Unauthorized access');
+        }
+
+        return compact('user', 'layout');
+    }
+
     public function get_dashboard_guru_page()
     {
         return view('guru.dashboard');
@@ -15,6 +40,8 @@ class GuruController extends Controller
     public function get_presensi_page()
     {
         $user = Auth::user();
+
+        $auth_user = $this->get_auth_user();
 
         $presensiHariIni = $user->presensi()
             ->whereDate('created_at', \Carbon\Carbon::today())
@@ -43,12 +70,15 @@ class GuruController extends Controller
             'sudahLaporPulang' => $sudahLaporPulang,
             'belumLaporKehadiran' => $belumLaporKehadiran,
             'dinasLuarHariIni' => $dinasLuarHariIni,
+            'layout' => $auth_user['layout']
         ]);
     }
 
     public function get_face_detection_page()
     {
         $user = Auth::user();
+
+        $auth_user = $this->get_auth_user();
 
         $presensiHariIni = $user->presensi()
             ->whereDate('created_at', \Carbon\Carbon::today())
@@ -57,42 +87,17 @@ class GuruController extends Controller
 
         return view('guru.face-presensi', [
             'userName' => $user->name,
-            'presensiHariIni' => $presensiHariIni
+            'presensiHariIni' => $presensiHariIni,
+            'layout' => $auth_user['layout']
         ]);
     }
 
     public function get_riwayat_presensi_guru_page(Request $request)
     {
-        $user = Auth::user();
+        $auth_user = $this->get_auth_user();
 
-        $query = $user->presensi()->orderBy('tanggal', 'desc');
-
-        if ($request->has('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->has('tanggal') && $request->tanggal) {
-            $query->whereDate('tanggal', $request->tanggal);
-        }
-
-        // Set per_page from request or default to 10
-        $perPage = $request->get('per_page', 2);
-        $presensi = $query->paginate($perPage);
-
-        // Preserve query parameters in pagination links
-        $presensi->appends($request->query());
-
-        if ($request->ajax()) {
-            // For AJAX requests, return only the table part
-            $html = view('guru.partials.presensi-table', compact('presensi'))->render();
-            return response()->json([
-                'html' => $html,
-                'total' => $presensi->total(),
-                'current_page' => $presensi->currentPage(),
-                'last_page' => $presensi->lastPage()
-            ]);
-        }
-
-        return view('guru.riwayat-presensi', compact('presensi'));
+        return view('guru.riwayat-presensi', [
+            'layout' => $auth_user['layout']
+        ]);
     }
 }

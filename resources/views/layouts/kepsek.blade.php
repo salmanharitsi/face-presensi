@@ -72,11 +72,12 @@
                     </h2>
                     <ul class="space-y-2">
                         <li>
-                            <a href="{{ route('dashboard-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-guru') }}">
-                                <i class="fas fa-home text-lg w-5 flex-shrink-0 {{ iconColor('dashboard-guru') }}"></i>
+                            <a href="{{ route('dashboard-kepsek') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-kepsek') }}">
+                                <i
+                                    class="fas fa-home text-lg w-5 flex-shrink-0 {{ iconColor('dashboard-kepsek') }}"></i>
                                 <span class="sidebar-text font-medium">Dashboard</span>
-                                @if(request()->routeIs('dashboard-guru'))
+                                @if(request()->routeIs('dashboard-kepsek'))
                                     <div class="sidebar-text ml-auto">
                                         <span class="w-2 h-2 bg-red bg-opacity-60 rounded-full"></span>
                                     </div>
@@ -112,6 +113,30 @@
                                 class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('profil') }}">
                                 <i class="fas fa-user-circle text-lg w-5 flex-shrink-0 {{ iconColor('profil') }}"></i>
                                 <span class="sidebar-text font-medium">Profil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('pengajuan-dinas-luar') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('pengajuan-dinas-luar') }}">
+                                <i
+                                    class="fas fa-briefcase text-lg w-5 flex-shrink-0 {{ iconColor('pengajuan-dinas-luar') }}"></i>
+                                <span class="sidebar-text font-medium">Pengajuan Dinas Luar</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('rekapitulasi-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('rekapitulasi-presensi') }}">
+                                <i
+                                    class="fas fa-chart-bar text-lg w-5 flex-shrink-0 {{ iconColor('rekapitulasi-presensi') }}"></i>
+                                <span class="sidebar-text font-medium">Rekapitulasi Presensi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('data-pengajar') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-pengajar') }}">
+                                <i
+                                    class="fas fa-chalkboard-teacher text-lg w-5 flex-shrink-0 {{ iconColor('data-pengajar') }}"></i>
+                                <span class="sidebar-text font-medium">Data Pengajar</span>
                             </a>
                         </li>
                     </ul>
@@ -153,11 +178,11 @@
                     <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-3">Home</h2>
                     <ul class="space-y-2">
                         <li>
-                            <a href="{{ route('dashboard-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-guru') }}">
-                                <i class="fas fa-home text-lg w-5 {{ iconColor('dashboard-guru') }}"></i>
+                            <a href="{{ route('dashboard-kepsek') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-kepsek') }}">
+                                <i class="fas fa-home text-lg w-5 {{ iconColor('dashboard-kepsek') }}"></i>
                                 <span class="font-medium">Dashboard</span>
-                                @if(request()->routeIs('dashboard-guru'))
+                                @if(request()->routeIs('dashboard-kepsek'))
                                     <div class="ml-auto">
                                         <span class="w-2 h-2 bg-white bg-opacity-60 rounded-full"></span>
                                     </div>
@@ -189,6 +214,27 @@
                                 class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('profil') }}">
                                 <i class="fas fa-user-circle text-lg w-5 {{ iconColor('profil') }}"></i>
                                 <span class="font-medium">Profil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('pengajuan-dinas-luar') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('pengajuan-dinas-luar') }}">
+                                <i class="fas fa-briefcase text-lg w-5 {{ iconColor('pengajuan-dinas-luar') }}"></i>
+                                <span class="font-medium">Pengajuan Dinas Luar</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('rekapitulasi-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('rekapitulasi-presensi') }}">
+                                <i class="fas fa-chart-bar text-lg w-5 {{ iconColor('rekapitulasi-presensi') }}"></i>
+                                <span class="font-medium">Rekapitulasi Presensi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('data-pengajar') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-pengajar') }}">
+                                <i class="fas fa-chalkboard-teacher text-lg w-5 {{ iconColor('data-pengajar') }}"></i>
+                                <span class="font-medium">Data Pengajar</span>
                             </a>
                         </li>
                     </ul>
@@ -227,7 +273,7 @@
 
                         <!-- Breadcrumb -->
                         <div class="hidden md:flex items-center space-x-2 text-sm">
-                            <a href="{{ route('dashboard-guru') }}"
+                            <a href="{{ route('dashboard-kepsek') }}"
                                 class="text-gray-500 hover:text-primary-600 transition-colors">Home</a>
 
                             @foreach (breadcrumb() as $item)
@@ -266,7 +312,7 @@
                                     <p class="text-sm font-semibold text-gray-800">
                                         {{ \Illuminate\Support\Str::limit(Auth::user()->name, 15) }}
                                     </p>
-                                    <p class="text-xs text-gray-500">Guru</p>
+                                    <p class="text-xs text-gray-500">Kepala Sekolah</p>
                                 </div>
                                 <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                             </button>

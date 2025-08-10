@@ -74,8 +74,16 @@ class AuthController extends Controller
                     "title" => "Berhasil masuk sebagai guru.",
                 ],
             ]),
-            // 'admin' => redirect()->route('dashboard.admin'),
-            // 'kepsek' => redirect()->route('dashboard.kepsek'),
+            'kepsek' => redirect(url('/dashboard-kepsek'))->with([
+                'success' => [
+                    "title" => "Berhasil masuk sebagai Kepala Sekolah.",
+                ],
+            ]),
+            'admin' => redirect(url('/dashboard-admin'))->with([
+                'success' => [
+                    "title" => "Berhasil masuk sebagai Admin.",
+                ],
+            ]),
             default => redirect('/'),
         };
     }

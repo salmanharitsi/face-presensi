@@ -19,6 +19,11 @@ return new class extends Migration
             $table->enum('role', ['admin', 'guru', 'kepsek']);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            $table->string('no_telepon')->nullable();
+            $table->string('alamat')->nullable();
+            $table->date('tanggal_lahir')->nullable();
+            $table->string('foto_profil')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
@@ -29,7 +34,7 @@ return new class extends Migration
             $table->date('tanggal');
             $table->time('jam_masuk')->nullable();
             $table->time('jam_keluar')->nullable();
-            $table->enum('status', ['hadir', 'tidak-hadir'])->nullable();
+            $table->enum('status', ['hadir', 'hadir-dl', 'tidak-hadir', 'hadir-tidak-lapor-pulang'])->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

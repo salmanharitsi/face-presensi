@@ -28,11 +28,20 @@ if (!function_exists('breadcrumb')) {
             'dashboard-guru' => [
                 ['label' => 'Dashboard'],
             ],
+            'dashboard-kepsek' => [
+                ['label' => 'Dashboard'],
+            ],
+            'dashboard-admin' => [
+                ['label' => 'Dashboard'],
+            ],
             'presensi-guru' => [
                 ['label' => 'Presensi'],
             ],
             'riwayat-presensi-guru' => [
                 ['label' => 'Riwayat Presensi'],
+            ],
+            'profil' => [
+                ['label' => 'Profil'],  
             ],
             'face-detection-page' => [
                 ['label' => 'Presensi', 'route' => 'presensi-guru'],

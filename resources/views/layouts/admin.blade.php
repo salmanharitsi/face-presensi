@@ -72,11 +72,12 @@
                     </h2>
                     <ul class="space-y-2">
                         <li>
-                            <a href="{{ route('dashboard-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-guru') }}">
-                                <i class="fas fa-home text-lg w-5 flex-shrink-0 {{ iconColor('dashboard-guru') }}"></i>
+                            <a href="{{ route('dashboard-admin') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-admin') }}">
+                                <i
+                                    class="fas fa-home text-lg w-5 flex-shrink-0 {{ iconColor('dashboard-admin') }}"></i>
                                 <span class="sidebar-text font-medium">Dashboard</span>
-                                @if(request()->routeIs('dashboard-guru'))
+                                @if(request()->routeIs('dashboard-admin'))
                                     <div class="sidebar-text ml-auto">
                                         <span class="w-2 h-2 bg-red bg-opacity-60 rounded-full"></span>
                                     </div>
@@ -92,26 +93,34 @@
                     </h2>
                     <ul class="space-y-2">
                         <li>
-                            <a href="{{ route('presensi-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive(['presensi-guru', 'face-detection-page']) }}">
-                                <i
-                                    class="fas fa-clock text-lg w-5 flex-shrink-0 {{ iconColor(['presensi-guru', 'face-detection-page']) }}"></i>
-                                <span class="sidebar-text font-medium">Presensi</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('riwayat-presensi-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('riwayat-presensi-guru') }}">
-                                <i
-                                    class="fas fa-list-check text-lg w-5 flex-shrink-0 {{ iconColor('riwayat-presensi-guru') }}"></i>
-                                <span class="sidebar-text font-medium">Riwayat Presensi</span>
-                            </a>
-                        </li>
-                        <li>
                             <a href="{{ route('profil') }}"
                                 class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('profil') }}">
                                 <i class="fas fa-user-circle text-lg w-5 flex-shrink-0 {{ iconColor('profil') }}"></i>
                                 <span class="sidebar-text font-medium">Profil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('data-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-presensi') }}">
+                                <i
+                                    class="fas fa-list-check text-lg w-5 flex-shrink-0 {{ iconColor('data-presensi') }}"></i>
+                                <span class="sidebar-text font-medium">Data Presensi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('rekapitulasi-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('rekapitulasi-presensi') }}">
+                                <i
+                                    class="fas fa-chart-bar text-lg w-5 flex-shrink-0 {{ iconColor('rekapitulasi-presensi') }}"></i>
+                                <span class="sidebar-text font-medium">Rekapitulasi Presensi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('data-pengajar') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-pengajar') }}">
+                                <i
+                                    class="fas fa-chalkboard-teacher text-lg w-5 flex-shrink-0 {{ iconColor('data-pengajar') }}"></i>
+                                <span class="sidebar-text font-medium">Data Pengajar</span>
                             </a>
                         </li>
                     </ul>
@@ -153,11 +162,11 @@
                     <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-3">Home</h2>
                     <ul class="space-y-2">
                         <li>
-                            <a href="{{ route('dashboard-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-guru') }}">
-                                <i class="fas fa-home text-lg w-5 {{ iconColor('dashboard-guru') }}"></i>
+                            <a href="{{ route('dashboard-admin') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('dashboard-admin') }}">
+                                <i class="fas fa-home text-lg w-5 {{ iconColor('dashboard-admin') }}"></i>
                                 <span class="font-medium">Dashboard</span>
-                                @if(request()->routeIs('dashboard-guru'))
+                                @if(request()->routeIs('dashboard-admin'))
                                     <div class="ml-auto">
                                         <span class="w-2 h-2 bg-white bg-opacity-60 rounded-full"></span>
                                     </div>
@@ -171,24 +180,32 @@
                     <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-3">Menu</h2>
                     <ul class="space-y-2">
                         <li>
-                            <a href="{{ route('presensi-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('presensi-guru') }}">
-                                <i class="fas fa-clock text-lg w-5 {{ iconColor('presensi-guru') }}"></i>
-                                <span class="font-medium">Presensi</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('riwayat-presensi-guru') }}"
-                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('riwayat-presensi-guru') }}">
-                                <i class="fas fa-list-check text-lg w-5 {{ iconColor('riwayat-presensi-guru') }}"></i>
-                                <span class="font-medium">Riwayat Presensi</span>
-                            </a>
-                        </li>
-                        <li>
                             <a href="{{ route('profil') }}"
                                 class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('profil') }}">
                                 <i class="fas fa-user-circle text-lg w-5 {{ iconColor('profil') }}"></i>
                                 <span class="font-medium">Profil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('data-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-presensi') }}">
+                                <i
+                                    class="fas fa-list-check text-lg w-5 flex-shrink-0 {{ iconColor('data-presensi') }}"></i>
+                                <span class="sidebar-text font-medium">Data Presensi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('rekapitulasi-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('rekapitulasi-presensi') }}">
+                                <i class="fas fa-chart-bar text-lg w-5 {{ iconColor('rekapitulasi-presensi') }}"></i>
+                                <span class="font-medium">Rekapitulasi Presensi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('data-pengajar') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-pengajar') }}">
+                                <i class="fas fa-chalkboard-teacher text-lg w-5 {{ iconColor('data-pengajar') }}"></i>
+                                <span class="font-medium">Data Pengajar</span>
                             </a>
                         </li>
                     </ul>
@@ -196,7 +213,7 @@
             </nav>
 
             <!-- Mobile Sidebar Footer -->
-            <div class="p-4 border-t border-gray-100 absolute bottom-0 bg-white w-full">
+            <div class="p-4 border-t border-gray-100 absolute bottom-0">
                 <a href="{{ route('logout') }}"
                     class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 hover-lift">
                     <i class="fas fa-sign-out-alt text-lg w-5"></i>
@@ -227,7 +244,7 @@
 
                         <!-- Breadcrumb -->
                         <div class="hidden md:flex items-center space-x-2 text-sm">
-                            <a href="{{ route('dashboard-guru') }}"
+                            <a href="{{ route('dashboard-admin') }}"
                                 class="text-gray-500 hover:text-primary-600 transition-colors">Home</a>
 
                             @foreach (breadcrumb() as $item)
@@ -266,7 +283,7 @@
                                     <p class="text-sm font-semibold text-gray-800">
                                         {{ \Illuminate\Support\Str::limit(Auth::user()->name, 15) }}
                                     </p>
-                                    <p class="text-xs text-gray-500">Guru</p>
+                                    <p class="text-xs text-gray-500">Admin</p>
                                 </div>
                                 <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                             </button>

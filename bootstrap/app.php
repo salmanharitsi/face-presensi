@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\GuruMiddleware;
+use App\Http\Middleware\KepsekMiddleware;
 use App\Http\Middleware\NoCacheMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'guru' => GuruMiddleware::class,
+            'kepsek' => KepsekMiddleware::class,
+            'admin' => AdminMiddleware::class,
             'no-cache' => NoCacheMiddleware::class
         ]);
     })

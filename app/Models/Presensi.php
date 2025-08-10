@@ -11,6 +11,8 @@ class Presensi extends Model
     use HasFactory;
 
     protected $table = 'presensi';
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'user_id',

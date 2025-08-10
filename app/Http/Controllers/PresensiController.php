@@ -18,8 +18,7 @@ class PresensiController extends Controller
         try {
             $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'user_name' => 'required|string',
-                'attendance_time' => 'required|date'
+                'user_name' => 'required|string'
             ]);
 
             $user = Auth::user();
@@ -42,8 +41,8 @@ class PresensiController extends Controller
                 ], 400);
             }
 
-            $today = Carbon::today();
-            $attendanceTime = Carbon::parse($request->attendance_time);
+            $today = Carbon::today('Asia/Jakarta');
+            $now = Carbon::now('Asia/Jakarta');
 
             // Cek apakah user sudah presensi hari ini
             $existingPresensi = Presensi::where('user_id', $user->id)
@@ -51,9 +50,9 @@ class PresensiController extends Controller
                 ->first();
 
             if ($existingPresensi) {
-                // Jika sudah ada presensi dan jam_masuk sudah terisi
+                // Jika sudah presensi masuk
                 if ($existingPresensi->jam_masuk !== null) {
-                    // Cek apakah jam_keluar sudah terisi (sudah lapor pulang)
+                    // Cek apakah sudah lapor pulang
                     if ($existingPresensi->jam_keluar !== null) {
                         return response()->json([
                             'error' => 'Anda sudah melakukan presensi masuk dan pulang untuk hari ini',
@@ -61,8 +60,8 @@ class PresensiController extends Controller
                         ], 400);
                     }
 
-                    // Update jam_keluar untuk lapor pulang
-                    $existingPresensi->jam_keluar = $attendanceTime->format('H:i:s');
+                    // Simpan jam_keluar
+                    $existingPresensi->jam_keluar = $now->format('H:i:s');
                     $existingPresensi->save();
 
                     return response()->json([
@@ -81,29 +80,36 @@ class PresensiController extends Controller
                 }
             }
 
-            // Jika belum ada presensi atau jam_masuk masih null, buat presensi baru (lapor masuk)
-            if ($existingPresensi) {
-                // Update existing record jika ada tapi jam_masuk null
-                $existingPresensi->jam_masuk = $attendanceTime->format('H:i:s');
-                $existingPresensi->jam_keluar = null;
-                $existingPresensi->status = "hadir";
-                $existingPresensi->save();
+            // Pengecekan status berdasarkan dinas luar
+            $status = 'hadir'; // default status
+            
+            // Cek apakah user memiliki dinas luar yang diterima untuk hari ini
+            $dinasLuar = $user->dinasLuar()
+                ->where('status', 'disetujui')
+                ->whereDate('tanggal', '<=', $today)
+                ->first();
 
-                $presensi = $existingPresensi;
-            } else {
-                // Buat presensi baru
-                $presensi = new Presensi();
-                $presensi->user_id = $request->user_id;
-                $presensi->tanggal = $today;
-                $presensi->jam_masuk = $attendanceTime->format('H:i:s');
-                $presensi->jam_keluar = null;
-                $presensi->status = "hadir";
-                $presensi->save();
+            if ($dinasLuar) {
+                $status = 'hadir-dl';
             }
+
+            // Buat presensi baru (lapor masuk)
+            $presensi = new Presensi();
+            $presensi->user_id = $user->id;
+            $presensi->tanggal = $today;
+            $presensi->jam_masuk = $now->format('H:i:s');
+            $presensi->jam_keluar = null;
+            $presensi->status = $status;
+            $presensi->save();
+
+            // Tentukan pesan berdasarkan status
+            $message = $status === 'hadir-dl' ? 
+                'Presensi masuk berhasil dicatat (Dinas Luar)' : 
+                'Presensi masuk berhasil dicatat';
 
             return response()->json([
                 'success' => true,
-                'message' => 'Presensi masuk berhasil dicatat',
+                'message' => $message,
                 'type' => 'masuk',
                 'presensi' => [
                     'id' => $presensi->id,
