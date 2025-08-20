@@ -44,6 +44,12 @@
                         Jam Keluar
                     </th>
                     <th scope="col" class="px-6 py-3 border-l border-white text-center whitespace-nowrap">
+                        Lokasi Masuk
+                    </th>
+                    <th scope="col" class="px-6 py-3 border-l border-white text-center whitespace-nowrap">
+                        Lokasi Keluar
+                    </th>
+                    <th scope="col" class="px-6 py-3 border-l border-white text-center whitespace-nowrap">
                         Status
                     </th>
                 </tr>
@@ -70,8 +76,35 @@
                             @endif
                         </td>
                         <td class="py-4 px-6 text-center">
-                            <div
-                                class="text-[13px] w-fit items-center mx-auto">
+                            @if ($data->latitude_masuk && $data->longitude_masuk)
+                                <button onclick="openLocation({{ $data->latitude_masuk }}, {{ $data->longitude_masuk }})" 
+                                    class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-full transition-colors duration-200 inline-flex items-center gap-1 whitespace-nowrap">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Lihat Lokasi
+                                </button>
+                            @else
+                                <span class="text-gray-400 text-xs">--</span>
+                            @endif
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            @if ($data->latitude_keluar && $data->longitude_keluar)
+                                <button onclick="openLocation({{ $data->latitude_keluar }}, {{ $data->longitude_keluar }})" 
+                                    class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-full transition-colors duration-200 inline-flex items-center gap-1 whitespace-nowrap">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Lihat Lokasi
+                                </button>
+                            @else
+                                <span class="text-gray-400 text-xs">--</span>
+                            @endif
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <div class="text-[13px] w-fit items-center mx-auto">
                                 @if ($data->status == 'hadir')
                                     <p class="text-green-700 border-green-600 bg-green-50 border-2 rounded-full whitespace-nowrap px-3 py-1 ">Hadir</p>
                                 @elseif($data->status == 'hadir-dl')
@@ -99,3 +132,16 @@
         {{ $presensi->links('vendor.pagination.custom-pagination') }}
     </div>
 </div>
+
+<script>
+    function openLocation(latitude, longitude) {
+        if (latitude && longitude) {
+            // URL Google Maps dengan koordinat
+            const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=15`;
+            // Buka di tab baru
+            window.open(mapsUrl, '_blank');
+        } else {
+            alert('Koordinat lokasi tidak tersedia');
+        }
+    }
+</script>

@@ -31,18 +31,18 @@ Route::group(['middleware' => ['kepsek', 'no-cache']], function () {
 // Route admin
 Route::group(['middleware' => ['admin', 'no-cache']], function () {
     Route::get('/dashboard-admin', [AdminController::class, 'get_dashboard_admin_page'])->name('dashboard-admin');
-    Route::get('/data-presensi', [AdminController::class, 'get_data_presensi_page'])->name('data-presensi');
 });
 
 // Route hanya untuk user yang sudah login (authenticated)
 Route::group(['middleware' => ['auth', 'no-cache']], function () {
     Route::get('/profil', [PublicController::class, 'get_profil_page'])->name('profil');
-
+    
     Route::get('/presensi-guru', [GuruController::class, 'get_presensi_page'])->name('presensi-guru');
     Route::get('/riwayat-presensi-guru', [GuruController::class, 'get_riwayat_presensi_guru_page'])->name('riwayat-presensi-guru');
     Route::get('/presensi-guru/face-detection', [GuruController::class, 'get_face_detection_page'])->name('face-detection-page');
     Route::get('/rekapitulasi-presensi', [PublicController::class, 'get_rekapitulasi_presensi_page'])->name('rekapitulasi-presensi');
     Route::get('/data-pengajar', [PublicController::class, 'get_data_pengajar_page'])->name('data-pengajar');
+    Route::get('/data-presensi', [PublicController::class, 'get_data_presensi_page'])->name('data-presensi');
     Route::prefix('api')->group(function () {
         Route::post('/process-presensi', [PresensiController::class, 'processPresensi']);
         Route::post('/process-pengajuan-dinas-luar', [DinasLuarController::class, 'pengajuan_dinas_luar']);

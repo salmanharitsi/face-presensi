@@ -35,6 +35,10 @@ return new class extends Migration
             $table->time('jam_masuk')->nullable();
             $table->time('jam_keluar')->nullable();
             $table->enum('status', ['hadir', 'hadir-dl', 'tidak-hadir', 'hadir-tidak-lapor-pulang'])->nullable();
+            $table->string('latitude_masuk')->nullable();
+            $table->string('longitude_masuk')->nullable();
+            $table->string('latitude_keluar')->nullable();
+            $table->string('longitude_keluar')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

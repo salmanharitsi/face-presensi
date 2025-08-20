@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends($layout)
 
 @section('title', 'Data Presensi')
 
@@ -8,7 +8,11 @@
         <div class="col-span-4 bg-white shadow-sm border rounded-xl">
             <div class="container mx-auto px-6 py-6">
                 <h1 class="text-2xl font-semibold text-gray-900">Data Presensi</h1>
-                <p class="text-gray-600 mt-1">Kelola data presensi pengajar</p>
+                @if (Auth::user()->role == 'admin')
+                    <p class="text-gray-600 mt-1">Kelola data presensi pengajar</p>
+                @else
+                    <p class="text-gray-600 mt-1">Lihat data presensi pengajar</p>
+                @endif
             </div>
         </div>
 

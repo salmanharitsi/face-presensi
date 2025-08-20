@@ -10,9 +10,4 @@ class AdminController extends Controller
     {
         return view('admin.dashboard');
     }
-
-    public function get_data_presensi_page()
-    {
-        return view('admin.data-presensi');
-    }
 }

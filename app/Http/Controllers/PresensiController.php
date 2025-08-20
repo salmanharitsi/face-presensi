@@ -18,7 +18,9 @@ class PresensiController extends Controller
         try {
             $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'user_name' => 'required|string'
+                'user_name' => 'required|string',
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
             ]);
 
             $user = Auth::user();
@@ -60,8 +62,10 @@ class PresensiController extends Controller
                         ], 400);
                     }
 
-                    // Simpan jam_keluar
+                    // Simpan jam_keluar dan koordinat keluar
                     $existingPresensi->jam_keluar = $now->format('H:i:s');
+                    $existingPresensi->latitude_keluar = $request->latitude;
+                    $existingPresensi->longitude_keluar = $request->longitude;
                     $existingPresensi->save();
 
                     return response()->json([
@@ -74,6 +78,10 @@ class PresensiController extends Controller
                             'jam_masuk' => $existingPresensi->jam_masuk,
                             'jam_keluar' => $existingPresensi->jam_keluar,
                             'status' => $existingPresensi->status,
+                            'latitude_masuk' => $existingPresensi->latitude_masuk,
+                            'longitude_masuk' => $existingPresensi->longitude_masuk,
+                            'latitude_keluar' => $existingPresensi->latitude_keluar,
+                            'longitude_keluar' => $existingPresensi->longitude_keluar,
                             'user_name' => $user->name
                         ]
                     ]);
@@ -100,6 +108,10 @@ class PresensiController extends Controller
             $presensi->jam_masuk = $now->format('H:i:s');
             $presensi->jam_keluar = null;
             $presensi->status = $status;
+            $presensi->latitude_masuk = $request->latitude;
+            $presensi->longitude_masuk = $request->longitude;
+            $presensi->latitude_keluar = null; // Kosongkan untuk keluar
+            $presensi->longitude_keluar = null; // Kosongkan untuk keluar
             $presensi->save();
 
             // Tentukan pesan berdasarkan status
@@ -117,6 +129,10 @@ class PresensiController extends Controller
                     'jam_masuk' => $presensi->jam_masuk,
                     'jam_keluar' => $presensi->jam_keluar,
                     'status' => $presensi->status,
+                    'latitude_masuk' => $presensi->latitude_masuk,
+                    'longitude_masuk' => $presensi->longitude_masuk,
+                    'latitude_keluar' => $presensi->latitude_keluar,
+                    'longitude_keluar' => $presensi->longitude_keluar,
                     'user_name' => $user->name
                 ]
             ]);

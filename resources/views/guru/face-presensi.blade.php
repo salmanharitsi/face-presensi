@@ -19,6 +19,18 @@
                     </div>
                 </div>
 
+                <!-- Location Tracking Card -->
+                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-start space-x-3 mb-6">
+                    <svg class="w-6 h-6 text-yellow-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 11c0 .552-.448 1-1 1s-1-.448-1-1 .448-1 1-1 1 .448 1 1zm0-7a9 9 0 100 18 9 9 0 000-18z" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold text-yellow-700">Lokasi Anda Sedang Dilacak</p>
+                        <p class="text-sm text-yellow-600">Sistem akan merekam lokasi presensi untuk keperluan verifikasi.</p>
+                    </div>
+                </div>
+
                 <!-- Camera Section -->
                 <div class="p-6">
                     <div class="relative">
@@ -166,6 +178,8 @@
             let faceMatcher;
             let isRecognized = false;
             let canvas;
+            let userLatitude = null;
+            let userLongitude = null;
 
             async function startVideo() {
                 try {
@@ -264,6 +278,8 @@
                             user_id: loggedInUserId,
                             user_name: loggedInUserName,
                             attendance_time: new Date().toISOString(),
+                            latitude: userLatitude,
+                            longitude: userLongitude,
                             status: 'Hadir' // jika dibutuhkan
                         })
                     });
@@ -395,6 +411,23 @@
             } catch (error) {
                 console.error('❌ Initialization error:', error);
                 hideLoading();
+            }
+
+            // Ambil lokasi saat halaman dimuat
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLatitude = position.coords.latitude;
+                        userLongitude = position.coords.longitude;
+                        console.log(`📍 Lokasi: ${userLatitude}, ${userLongitude}`);
+                    },
+                    (error) => {
+                        console.error("❌ Gagal mendapatkan lokasi:", error);
+                        alert("Gagal mendapatkan lokasi. Pastikan izin lokasi aktif di browser Anda.");
+                    }
+                );
+            } else {
+                alert("Browser Anda tidak mendukung geolocation.");
             }
         });
     </script>

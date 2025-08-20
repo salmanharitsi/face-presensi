@@ -51,4 +51,11 @@ class PublicController extends Controller
 
         return view('public.data-pengajar', compact('layout'));
     }
+
+    public function get_data_presensi_page()
+    {
+        [, $layout] = $this->getAuthUserWithLayout();
+
+        return view('public.data-presensi', compact('layout'));
+    }
 }

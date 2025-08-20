@@ -20,6 +20,10 @@ class Presensi extends Model
         'jam_masuk',
         'jam_keluar',
         'status',
+        'latitude_masuk',
+        'longitude_masuk',
+        'latitude_keluar',
+        'longitude_keluar',
     ];
 
     protected static function boot()

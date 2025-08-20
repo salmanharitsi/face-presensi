@@ -39,13 +39,12 @@
     @include('_message')
 
     <!-- Mobile Overlay -->
-    <div id="mobile-overlay"
-        class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden transition-opacity duration-300"></div>
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden transition-opacity duration-300"></div>
 
     <div class="flex">
         <!-- Sidebar -->
         <aside id="sidebar"
-            class="sidebar-transition sidebar-expanded desktop-sidebar hidden lg:block bg-white shadow-2xl z-40">
+            class="sidebar-transition sidebar-expanded desktop-sidebar hidden lg:flex bg-white shadow-2xl z-40 h-screen flex-col">
             <!-- Sidebar Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
                 <div class="flex items-center space-x-3" id="logo-section">
@@ -132,6 +131,14 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('data-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-presensi') }}">
+                                <i
+                                    class="fas fa-list-check text-lg w-5 flex-shrink-0 {{ iconColor('data-presensi') }}"></i>
+                                <span class="sidebar-text font-medium">Data Presensi</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('data-pengajar') }}"
                                 class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-pengajar') }}">
                                 <i
@@ -144,7 +151,7 @@
             </nav>
 
             <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-gray-100 w-full absolute bottom-0 bg-white">
+            <div class="p-4 border-t border-gray-100 bg-white mt-auto">
                 <a href="{{ route('logout') }}"
                     class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 hover-lift">
                     <i class="fas fa-sign-out-alt text-lg w-5 flex-shrink-0"></i>
@@ -154,7 +161,7 @@
         </aside>
 
         <!-- Mobile Sidebar -->
-        <aside id="mobile-sidebar" class="mobile-sidebar lg:hidden bg-white shadow-2xl">
+        <aside id="mobile-sidebar" class="mobile-sidebar lg:hidden bg-white shadow-2xl fixed inset-y-0 left-0 w-[300px] h-screen z-50 flex flex-col">
             <!-- Mobile Sidebar Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-100">
                 <div class="flex items-center space-x-3">
@@ -231,6 +238,14 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('data-presensi') }}"
+                                class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-presensi') }}">
+                                <i
+                                    class="fas fa-list-check text-lg w-5 flex-shrink-0 {{ iconColor('data-presensi') }}"></i>
+                                <span class="sidebar-text font-medium">Data Presensi</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('data-pengajar') }}"
                                 class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl {{ menuActive('data-pengajar') }}">
                                 <i class="fas fa-chalkboard-teacher text-lg w-5 {{ iconColor('data-pengajar') }}"></i>
@@ -242,7 +257,7 @@
             </nav>
 
             <!-- Mobile Sidebar Footer -->
-            <div class="p-4 border-t border-gray-100 absolute bottom-0 bg-white w-full">
+            <div class="p-4 border-t border-gray-100 bg-white mt-auto">
                 <a href="{{ route('logout') }}"
                     class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 hover-lift">
                     <i class="fas fa-sign-out-alt text-lg w-5"></i>
