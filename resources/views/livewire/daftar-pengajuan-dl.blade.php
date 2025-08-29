@@ -46,6 +46,9 @@
                         Keterangan
                     </th>
                     <th scope="col" class="px-6 py-3 border-l border-white text-center whitespace-nowrap">
+                        Surat Izin
+                    </th>
+                    <th scope="col" class="px-6 py-3 border-l border-white text-center whitespace-nowrap">
                         Status
                     </th>
                     <th scope="col" class="px-6 py-3 border-l border-white text-center whitespace-nowrap">
@@ -65,6 +68,13 @@
                         </td>
                         <td class="py-4 px-6 text-left">
                             {{ $data->keterangan }}
+                        </td>
+                        <td class="py-4 px-6 text-left">
+                            <div class="mx-auto text-xs w-fit flex items-center gap-1 bg-blue-600 border border-transparent px-2 py-2 rounded-lg text-white hover:bg-blue-100 hover:border hover:border-blue-600 hover:text-blue-600 transition-all duration-200 cursor-pointer lihat-surat"
+                                data-url="{{ asset('storage/' . $data->surat_izin) }}">
+                                <i class="fas fa-eye mr-1"></i>
+                                Lihat Surat
+                            </div>
                         </td>
                         <td class="py-4 px-6 text-center">
                             <div class="text-[13px] w-fit items-center mx-auto">
@@ -123,15 +133,16 @@
     </div>
 
     <!-- Modal Konfirmasi -->
-    @if($showModal)
+    @if ($showModal)
         <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
             wire:click="closeModal">
             <div class="relative p-5 border w-96 shadow-lg rounded-md bg-white" wire:click.stop>
                 <div class="mt-3 text-center">
                     <!-- Icon -->
-                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full 
+                    <div
+                        class="mx-auto flex items-center justify-center h-12 w-12 rounded-full 
                         {{ $actionType === 'setujui' ? 'bg-green-100' : 'bg-red-100' }}">
-                        @if($actionType === 'setujui')
+                        @if ($actionType === 'setujui')
                             <i class="fas fa-check text-green-600 text-xl"></i>
                         @else
                             <i class="fas fa-times text-red-600 text-xl"></i>
@@ -147,7 +158,8 @@
                     <div class="mt-2 px-7 py-3">
                         <p class="text-sm text-gray-500">
                             Apakah Anda yakin ingin
-                            <span class="font-semibold {{ $actionType === 'setujui' ? 'text-green-600' : 'text-red-600' }}">
+                            <span
+                                class="font-semibold {{ $actionType === 'setujui' ? 'text-green-600' : 'text-red-600' }}">
                                 {{ $actionType === 'setujui' ? 'menyetujui' : 'menolak' }}
                             </span>
                             pengajuan dinas luar milik
@@ -167,7 +179,8 @@
                             </button>
 
                             <!-- Confirm Button -->
-                            <button wire:click="confirmAction" class="px-4 py-2 flex-1 text-white text-base font-medium rounded-md w-24 shadow-sm focus:outline-none focus:ring-2 transition-all duration-200
+                            <button wire:click="confirmAction"
+                                class="px-4 py-2 flex-1 text-white text-base font-medium rounded-md w-24 shadow-sm focus:outline-none focus:ring-2 transition-all duration-200
                                 {{ $actionType === 'setujui'
                                     ? 'bg-green-600 hover:bg-green-700 focus:ring-green-300'
                                     : 'bg-red-600 hover:bg-red-700 focus:ring-red-300' }}">
@@ -179,4 +192,52 @@
             </div>
         </div>
     @endif
+
+    <!-- Modal Surat Izin -->
+    <div id="suratModal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-4 relative">
+            <!-- Tombol Close -->
+            <button id="closeSuratModal"
+                class="absolute top-3 right-3 text-gray-600 hover:text-red-600 text-lg font-bold">
+                &times;
+            </button>
+            <!-- Preview Gambar -->
+            <div class="text-center">
+                <img id="suratPreview" src="" alt="Surat Izin"
+                    class="max-h-[80vh] mx-auto rounded-md shadow-md">
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.lihat-surat');
+        const modal = document.getElementById('suratModal');
+        const preview = document.getElementById('suratPreview');
+        const closeModal = document.getElementById('closeSuratModal');
+
+        // Event saat klik tombol "Lihat Surat"
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                preview.src = url; // Set gambar ke modal
+                modal.classList.remove('hidden');
+            });
+        });
+
+        // Event untuk menutup modal
+        closeModal.addEventListener('click', function() {
+            modal.classList.add('hidden');
+            preview.src = '';
+        });
+
+        // Tutup modal saat klik area di luar konten
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                preview.src = '';
+            }
+        });
+    });
+</script>

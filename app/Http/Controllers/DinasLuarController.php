@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\DinasLuar;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DinasLuarController extends Controller
 {
@@ -14,6 +17,7 @@ class DinasLuarController extends Controller
             // Validasi input
             $validated = $request->validate([
                 'keterangan' => 'required|string|min:10|max:1000',
+                'surat_izin'  => 'required|file|mimes:jpg,jpeg,png|max:200',
             ], [
                 'keterangan.required' => 'Keterangan harus diisi.',
                 'keterangan.min' => 'Keterangan minimal 10 karakter.',
@@ -42,21 +46,26 @@ class DinasLuarController extends Controller
                 ]);
             }
 
+            $file = $request->file('surat_izin');
+            $ext = $file->getClientOriginalExtension();
+
+            $slugName = Str::slug($user->name, '-');
+            $stamp = Carbon::now()->format('Ymd-His');
+
+            $filename = "suratizin-{$slugName}-{$stamp}.{$ext}";
+
+            // simpan ke disk public dalam folder surat-izin
+            // hasil $storedPath misalnya: "surat-izin/suratizin-salman-haritsi-20250829-093012.jpg"
+            $storedPath = $file->storeAs('surat-izin', $filename, 'public');
+
             // Simpan data dinas luar
             $dinasLuar = new DinasLuar();
             $dinasLuar->user_id = $user->id;
             $dinasLuar->tanggal = now();
             $dinasLuar->keterangan = $validated['keterangan'];
             $dinasLuar->status = 'menunggu';
-            $dinasLuar->save();
-
-            // Log aktivitas
-            \Log::info('Dinas Luar Created', [
-                'user_id' => $user->id,
-                'user_name' => $user->name,
-                'dinas_luar_id' => $dinasLuar->id,
-                'tanggal' => $dinasLuar->tanggal
-            ]);
+            $dinasLuar->surat_izin = $storedPath;
+            $dinasLuar->save();     
 
             // Response untuk AJAX request
             if ($request->expectsJson() || $request->ajax()) {
@@ -67,6 +76,7 @@ class DinasLuarController extends Controller
                         'id' => $dinasLuar->id,
                         'tanggal' => $dinasLuar->tanggal->format('d-m-Y'),
                         'status' => $dinasLuar->status,
+                        'surat_izin' => $dinasLuar->surat_izin,
                         'created_at' => $dinasLuar->created_at->format('d-m-Y H:i:s')
                     ]
                 ], 201);

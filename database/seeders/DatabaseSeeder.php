@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         // Jalankan semua seeder yang dibutuhkan
         $this->call([
             UserSeeder::class,
+            PresensiSeeder::class
         ]);
     }
 }

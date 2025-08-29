@@ -261,7 +261,7 @@
                                         <div class="space-y-4">
                                             <p class="text-gray-600 text-lg leading-relaxed text-center">
                                                 Pengajuan dinas luar Anda sedang menunggu persetujuan dari Kepala Sekolah.
-                                                Mohon tunggu notifikasi selanjutnya.
+                                                Mohon tunggu informasi selanjutnya.
                                             </p>
                                         </div>
 
@@ -271,8 +271,7 @@
                                                 <i class="fas fa-info-circle text-amber-500 mr-3"></i>
                                                 <div>
                                                     <p class="text-amber-800 font-medium">Status: Menunggu Persetujuan</p>
-                                                    <p class="text-amber-600 text-sm">Anda akan menerima notifikasi setelah pengajuan
-                                                        diproses</p>
+                                                    <p class="text-amber-600 text-sm">Silahkan cek sistem secara berkala</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1255,7 +1254,7 @@
     @if($belumLaporKehadiran)
         <div id="dinasLuarModal"
             class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl max-w-md w-full mx-4 shadow-3xl transform transition-all duration-300 scale-95 opacity-0"
+            <div class="bg-white rounded-xl max-w-lg w-full mx-4 shadow-3xl transform transition-all duration-300 scale-95 opacity-0"
                 id="modalContent">
 
                 <!-- Modal Header -->
@@ -1281,7 +1280,7 @@
                 </div>
 
                 <!-- Modal Body -->
-                <form id="dinasLuarForm" action="{{ url('/api/process-pengajuan-dinas-luar') }}" method="POST" class="p-6">
+                <form id="dinasLuarForm" action="{{ url('/api/process-pengajuan-dinas-luar') }}" method="POST" enctype="multipart/form-data" class="p-6 !mb-0">
                     @csrf
 
                     <!-- Nama Field -->
@@ -1302,8 +1301,20 @@
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
                     </div>
 
+                    <!-- Surat Izin Upload Field -->
+                    <div class="mb-3">
+                        <label for="surat_izin" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-file-upload text-purple-500 mr-2"></i>Surat Izin <span class="text-xs">(max 200kb)</span>
+                        </label>
+                        <input type="file" id="surat_izin" name="surat_izin" accept=".jpg,.jpeg,.png" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                        @error('surat_izin')
+                            <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Keterangan Field -->
-                    <div class="mb-6">
+                    <div class="mb-3">
                         <label for="keterangan" class="block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-edit text-purple-500 mr-2"></i>Keterangan
                         </label>

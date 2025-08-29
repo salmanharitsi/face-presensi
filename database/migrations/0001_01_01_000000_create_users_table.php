@@ -49,6 +49,7 @@ return new class extends Migration
             $table->string('user_id');
             $table->date('tanggal');
             $table->text('keterangan');
+            $table->string('surat_izin')->nullable();
             $table->enum('status', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu')->nullable();
             $table->timestamps();
 

@@ -159,7 +159,7 @@ class DataPresensi extends Component
     public function render()
     {
         // Get all users for filter dropdown
-        $users = User::orderBy('name')->get();
+        $users = User::where('role', '!=', 'admin')->orderBy('name')->get();
         
         // Build query for presensi
         $query = Presensi::with('user')->orderBy('tanggal', 'desc');

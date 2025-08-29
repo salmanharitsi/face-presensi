@@ -17,6 +17,7 @@ class DinasLuar extends Model
         'tanggal',
         'keterangan',
         'status',
+        'surat_izin'
     ];
 
     protected static function boot()
