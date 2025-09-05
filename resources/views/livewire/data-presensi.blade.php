@@ -111,7 +111,7 @@
                                     Lihat Lokasi
                                 </button>
                             @else
-                                <span class="text-gray-400 text-xs">--</span>
+                                <span class="">--</span>
                             @endif
                         </td>
                         <td class="py-4 px-6 text-center">
@@ -125,7 +125,7 @@
                                     Lihat Lokasi
                                 </button>
                             @else
-                                <span class="text-gray-400 text-xs">--</span>
+                                <span class="">--</span>
                             @endif
                         </td>
                         <td class="py-4 px-6 text-center">
