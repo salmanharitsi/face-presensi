@@ -86,8 +86,12 @@ class DataPresensi extends Component
         
         if ($this->presensiToEdit) {
             // Set form values
-            $this->editJamMasuk = $this->presensiToEdit->jam_masuk ?? '';
-            $this->editJamKeluar = $this->presensiToEdit->jam_keluar ?? '';
+            $this->editJamMasuk = $this->presensiToEdit->jam_masuk
+            ? \Carbon\Carbon::parse($this->presensiToEdit->jam_masuk)->format('H:i')
+            : '';
+            $this->editJamKeluar = $this->presensiToEdit->jam_keluar
+            ? \Carbon\Carbon::parse($this->presensiToEdit->jam_keluar)->format('H:i')
+            : '';
             $this->editStatus = $this->presensiToEdit->status;
             
             $this->showEditModal = true;
